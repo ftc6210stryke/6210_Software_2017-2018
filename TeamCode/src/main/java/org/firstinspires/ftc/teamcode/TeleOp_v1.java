@@ -54,8 +54,8 @@ public class TeleOp_v1 extends OpMode
 
         //assuming pushing joysticks at 45 will return 1,1 rather than .5,.5 must be tested
 
-        ypower = gamepad1.right_stick_y;
-        xpower = gamepad1.right_stick_x;
+        ypower = Math.pow(gamepad1.right_stick_y, 2);
+        xpower = Math.pow(gamepad1.right_stick_x, 2);
         rturnpower = gamepad1.right_trigger;
         lturnpower = -gampad1.left_trigger;
 
@@ -75,10 +75,10 @@ public class TeleOp_v1 extends OpMode
         }
         else if (xpower > .1 || ypower >.1)
         {
-            frdrive.setPower(ypower/2 + xpower/2);
-            fldrive.setPower(-(ypower/2 - xpower/2));
-            brdrive.setPower(ypower/2 - xpower/2);
-            bldrive.setPower(-(ypower/2 + xpower/2));
+            frdrive.setPower(Math.pow(ypower + xpower, .5));
+            fldrive.setPower(-Math.pow(ypower - xpower, .5));
+            brdrive.setPower(Math.pow(ypower - xpower, .5));
+            bldrive.setPower(-Math.pow(ypower + xpower, .5));
         }
 
         telemetry.addData("Status", "Run Time: " + runtime.toString());
