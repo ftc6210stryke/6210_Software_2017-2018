@@ -1,3 +1,4 @@
+package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -5,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="TeleOp v1.0", group="TeleOp")
+@TeleOp(name="TeleOp v1.1", group="TeleOp")
 public class TeleOp_v1 extends OpMode
 {
     private ElapsedTime runtime = new ElapsedTime();
@@ -55,42 +56,49 @@ public class TeleOp_v1 extends OpMode
 
         xpower = 0;
         ypower = 0;
-        if (gamepad1.right_stick_y != 0)
+        if (Math.abs(gamepad1.right_stick_y) > .1)
         {
             ypower = Math.pow(gamepad1.right_stick_y, 2) * gamepad1.right_stick_y / Math.abs(gamepad1.right_stick_y);
-            if (ypower > .45 || ypower < -.45) {
+            if (Math.abs(ypower) > .45) {
                 ypower = (ypower / Math.abs(ypower)) * .45;
             }
         }
-        if (gamepad1.right_stick_x != 0)
+        if (Math.abs(gamepad1.right_stick_x) > .1)
         {
             xpower = Math.pow(gamepad1.right_stick_x, 2) * gamepad1.right_stick_x / Math.abs(gamepad1.right_stick_x);
-            if (xpower > .45 || ypower < -.45) {
+            if (Math.abs(xpower) > .45) {
                 xpower = (xpower / Math.abs(xpower)) * .45;
             }
         }
         rturnpower = gamepad1.right_trigger;
         lturnpower = -gamepad1.left_trigger;
 
-        if (rturnpower > .1 && lturnpower < .1)
+        if (rturnpower > .2)
         {
             frdrive.setPower(rturnpower);
             fldrive.setPower(rturnpower);
             brdrive.setPower(rturnpower);
             bldrive.setPower(rturnpower);
         }
-        else if (lturnpower > .1)
+        else if (lturnpower > .2)
         {
             frdrive.setPower(lturnpower);
             fldrive.setPower(lturnpower);
             brdrive.setPower(lturnpower);
             bldrive.setPower(lturnpower);
         }
-        else if (xpower > .1 || xpower < -.1 || ypower > .1 || ypower < -.1)
+        else if (Math.abs(gamepad1.right_stick_x) > .2 || Math.abs(gamepad1.right_stick_y) > .2)
         {
             frdrive.setPower(Math.pow(Math.abs(ypower + xpower), .5) * (ypower+xpower)/Math.abs(ypower+xpower));
-            fldrive.setPower(-Math.pow(Math.abs(ypower - xpower), .5) * (ypower+xpower)/Math.abs(ypower+xpower));
+            fldrive.setPower(-Math.pow(Math.abs(ypower - xpower), .5) * (ypower-xpower)/Math.abs(ypower-xpower));
             bldrive.setPower(-Math.pow(Math.abs(ypower + xpower), .5) * (ypower+xpower)/Math.abs(ypower+xpower));
+            brdrive.setPower(Math.pow(Math.abs(ypower - xpower), .5) * (ypower-xpower)/Math.abs(ypower-xpower));
+        } else
+        {
+            frdrive.setPower(0);
+            fldrive.setPower(0);
+            bldrive.setPower(0);
+            brdrive.setPower(0);
         }
 
         telemetry.addData("Status", "Run Time: " + runtime.toString());
