@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+//package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@TeleOp(name="TeleOp v1.1", group="TeleOp")
+@TeleOp(name="TeleOp v1.2", group="TeleOp")
 public class TeleOp_v1 extends OpMode
 {
     private ElapsedTime runtime = new ElapsedTime();
@@ -71,7 +71,7 @@ public class TeleOp_v1 extends OpMode
             }
         }
         rturnpower = gamepad1.right_trigger;
-        lturnpower = -gamepad1.left_trigger;
+        lturnpower = gamepad1.left_trigger;
 
         if (rturnpower > .2)
         {
@@ -82,10 +82,10 @@ public class TeleOp_v1 extends OpMode
         }
         else if (lturnpower > .2)
         {
-            frdrive.setPower(lturnpower);
-            fldrive.setPower(lturnpower);
-            brdrive.setPower(lturnpower);
-            bldrive.setPower(lturnpower);
+            frdrive.setPower(-lturnpower);
+            fldrive.setPower(-lturnpower);
+            brdrive.setPower(-lturnpower);
+            bldrive.setPower(-lturnpower);
         }
         else if (Math.abs(gamepad1.right_stick_x) > .2 || Math.abs(gamepad1.right_stick_y) > .2)
         {
