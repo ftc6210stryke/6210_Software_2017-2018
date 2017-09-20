@@ -11,6 +11,7 @@ the driver controlled period of FTC's Relic Recovery competition.
  */
 
 package org.firstinspires.ftc.teamcode;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -72,6 +73,8 @@ public class TeleOp_v1 extends OpMode
     @Override
     public void loop() {
 
+        toggleguard = System.currentTimeMillis();
+
         // Mecanum Drive
         if (tank = false) {
             xpower = 0;
@@ -99,17 +102,17 @@ public class TeleOp_v1 extends OpMode
 
             //If rturnpower if greater than .1, turn right
             if (rturnpower > .1) {
-                frdrive.setPower(rturnpower * drivePowerMod);
-                fldrive.setPower(rturnpower * drivePowerMod);
-                brdrive.setPower(rturnpower * drivePowerMod);
-                bldrive.setPower(rturnpower * drivePowerMod);
+                frdrive.setPower(-rturnpower * drivePowerMod);
+                fldrive.setPower(-rturnpower * drivePowerMod);
+                brdrive.setPower(-rturnpower * drivePowerMod);
+                bldrive.setPower(-rturnpower * drivePowerMod);
             }
             //If lturnpower if greater than .1, turn left
             else if (lturnpower > .1) {
-                frdrive.setPower(-lturnpower * drivePowerMod);
-                fldrive.setPower(-lturnpower * drivePowerMod);
-                brdrive.setPower(-lturnpower * drivePowerMod);
-                bldrive.setPower(-lturnpower * drivePowerMod);
+                frdrive.setPower(lturnpower * drivePowerMod);
+                fldrive.setPower(lturnpower * drivePowerMod);
+                brdrive.setPower(lturnpower * drivePowerMod);
+                bldrive.setPower(lturnpower * drivePowerMod);
             }
             //if either joystick is over .1, engage mecanum drive
             else if (Math.abs(gamepad1.right_stick_x) > .1 || Math.abs(gamepad1.right_stick_y) > .1) {
