@@ -35,29 +35,18 @@ public class TeleOpTank extends OpMode
         if (Math.abs(gamepad1.left_stick_y) > .1)
         {
             bldrive.setPower(gamepad1.left_stick_y);
+            fldrive.setPower(gamepad1.left_stick_y);
         }
-        else (bldrive.setpower(0));
+        else {bldrive.setpower(0);
+            fldrive.setPower(0);}
 
         if (Math.abs(gamepad1.right_stick_y) > .1)
         {
             brdrive.setPower(gamepad1.right_stick_y);
-
-
-        }
-        else (brdrive.setPower(0));
-
-        if (Math.abs(gamepsd1.left_stick_y) > .1)
-        {
-            fldrive.setPower(gamepad1.left_stick_y);
-
-        }
-           else(fldrive.setPower(0));
-
-        if (Math.abs(gamepad1.right_stick_y) > .1 )
-        {
             frdrive.setPower(gamepad1.right_stick_y);
         }
-        else (frdrive.setPower(0));
+        else {brdrive.setPower(0);
+            frdrive.setPower(0);}
 
         telemetry.addData("Status", "Run Time: " + runtime.toString());
     }
