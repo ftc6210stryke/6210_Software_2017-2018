@@ -39,10 +39,10 @@ public class TeleOp_v1 extends OpMode
     @Override
     public void init() {
 
-        bldrive  = hardwareMap.get(DcMotor.class, "c");
-        brdrive = hardwareMap.get(DcMotor.class, "d");
-        fldrive  = hardwareMap.get(DcMotor.class, "a");
-        frdrive = hardwareMap.get(DcMotor.class, "b");
+        brdrive  = hardwareMap.get(DcMotor.class, "c");
+        bldrive = hardwareMap.get(DcMotor.class, "d");
+        frdrive  = hardwareMap.get(DcMotor.class, "a");
+        fldrive = hardwareMap.get(DcMotor.class, "b");
         drivePowerMod = 1;
         xpower = 0;
         ypower = 0;
@@ -73,10 +73,10 @@ public class TeleOp_v1 extends OpMode
     @Override
     public void loop() {
 
-        toggleguard = System.currentTimeMillis();
+        toggleguard = 0;
 
         // Mecanum Drive
-        if (tank = false) {
+        if (tank == false) {
             xpower = 0;
             ypower = 0;
             //Determine ypower from squaring the ystick multipled by +/-
@@ -127,8 +127,8 @@ public class TeleOp_v1 extends OpMode
                 }
                 //otherwise, subtpower motors are turned off
                 else {
-                    fldrive.setPower(0);
-                    brdrive.setPower(0);
+                    frdrive.setPower(0);
+                    bldrive.setPower(0);
                 }
                 //as long as pluspower is over .1 (so as not to take sqaureroot of zero) power plus motors
                 // using the squareroot of pluspower times +/-
@@ -138,8 +138,8 @@ public class TeleOp_v1 extends OpMode
                 }
                 //otherwise, pluspower motors are turned off
                 else {
-                    frdrive.setPower(0);
-                    bldrive.setPower(0);
+                    fldrive.setPower(0);
+                    brdrive.setPower(0);
                 }
             }
             //if not input from triggers or stick, turn motors off
@@ -151,7 +151,21 @@ public class TeleOp_v1 extends OpMode
             }
         } else {
 
-            //INSERT ROHIT & NIHAL'S TANK DRIVE
+            if (Math.abs(gamepad1.left_stick_y) > .1)
+            {
+                bldrive.setPower(-gamepad1.left_stick_y);
+                fldrive.setPower(-gamepad1.left_stick_y);
+            }
+            else {bldrive.setPower(0);
+                fldrive.setPower(0);}
+
+            if (Math.abs(gamepad1.right_stick_y) > .1)
+            {
+                brdrive.setPower(gamepad1.right_stick_y);
+                frdrive.setPower(gamepad1.right_stick_y);
+            }
+            else {brdrive.setPower(0);
+                frdrive.setPower(0);}
 
         }
 

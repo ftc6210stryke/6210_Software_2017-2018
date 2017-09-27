@@ -1,8 +1,10 @@
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+@Disabled
 @TeleOp(name="TeleOp Tank", group="TeleOp")
 public class TeleOpTank extends OpMode
 {
@@ -37,7 +39,7 @@ public class TeleOpTank extends OpMode
             bldrive.setPower(gamepad1.left_stick_y);
             fldrive.setPower(gamepad1.left_stick_y);
         }
-        else {bldrive.setpower(0);
+        else {bldrive.setPower(0);
             fldrive.setPower(0);}
 
         if (Math.abs(gamepad1.right_stick_y) > .1)

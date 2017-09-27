@@ -27,6 +27,7 @@ public class AutoMain_v1 extends AutoLibrary_v1{
     @Override
     public void runOpMode() {
 
+        initialize();
         waitForStart();
         runtime.reset();
         //More later
