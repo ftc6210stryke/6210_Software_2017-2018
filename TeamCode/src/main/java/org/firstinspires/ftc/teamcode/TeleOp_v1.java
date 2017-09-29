@@ -34,6 +34,7 @@ public class TeleOp_v1 extends TeleOpLibrary_v1
     private double toggleguard;
     private double drivePowerMod;
     private boolean tank;
+    private boolean elevator_up;
 
 
     @Override
@@ -49,6 +50,7 @@ public class TeleOp_v1 extends TeleOpLibrary_v1
         lturnpower = 0;
         rturnpower = 0;
         tank = false;
+        toggleguard = 0;
 
         telemetry.addData("Status", "Initialized");
     }
@@ -72,8 +74,6 @@ public class TeleOp_v1 extends TeleOpLibrary_v1
 
     @Override
     public void loop() {
-
-        toggleguard = 0;
 
         // Mecanum Drive
         if (tank == false) {
@@ -102,17 +102,17 @@ public class TeleOp_v1 extends TeleOpLibrary_v1
 
             //If rturnpower if greater than .1, turn right
             if (rturnpower > .1) {
-                frdrive.setPower(-rturnpower * drivePowerMod);
-                fldrive.setPower(-rturnpower * drivePowerMod);
-                brdrive.setPower(-rturnpower * drivePowerMod);
-                bldrive.setPower(-rturnpower * drivePowerMod);
+                frdrive.setPower(rturnpower * drivePowerMod);
+                fldrive.setPower(rturnpower * drivePowerMod);
+                brdrive.setPower(rturnpower * drivePowerMod);
+                bldrive.setPower(rturnpower * drivePowerMod);
             }
             //If lturnpower if greater than .1, turn left
             else if (lturnpower > .1) {
-                frdrive.setPower(lturnpower * drivePowerMod);
-                fldrive.setPower(lturnpower * drivePowerMod);
-                brdrive.setPower(lturnpower * drivePowerMod);
-                bldrive.setPower(lturnpower * drivePowerMod);
+                frdrive.setPower(-lturnpower * drivePowerMod);
+                fldrive.setPower(-lturnpower * drivePowerMod);
+                brdrive.setPower(-lturnpower * drivePowerMod);
+                bldrive.setPower(-lturnpower * drivePowerMod);
             }
             //if either joystick is over .1, engage mecanum drive
             else if (Math.abs(gamepad1.right_stick_x) > .1 || Math.abs(gamepad1.right_stick_y) > .1) {
@@ -170,7 +170,7 @@ public class TeleOp_v1 extends TeleOpLibrary_v1
         }
 
         // Mecanum-Tank Toggle
-        if (gamepad1.b && System.currentTimeMillis() - toggleguard > 100)
+        if (gamepad1.b && System.currentTimeMillis() - toggleguard > 500)
         {
             toggleguard = System.currentTimeMillis();
             if (tank == false)
@@ -182,12 +182,12 @@ public class TeleOp_v1 extends TeleOpLibrary_v1
         }
 
         // toggle reduces drive speed to 2/3s power
-        if (gamepad1.y && System.currentTimeMillis() - toggleguard > 100)
+        if (gamepad1.y && System.currentTimeMillis() - toggleguard > 500)
         {
             toggleguard = System.currentTimeMillis();
             if (drivePowerMod == 1)
             {
-                drivePowerMod = .66;
+                drivePowerMod = .5;
             } else {
                 drivePowerMod = 1;
             }
@@ -195,6 +195,8 @@ public class TeleOp_v1 extends TeleOpLibrary_v1
 
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Joystick", "xpower (%.2f), ypower (%.2f)", xpower, ypower);
+
+        public void elevator_up()   {
     }
 
     /*
