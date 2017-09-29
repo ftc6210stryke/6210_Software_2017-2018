@@ -174,15 +174,15 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
 
     //====================== ENCODER + GYRO MOVE ======================
 
-    public void move_advanced (double ypower, double xpower, double threshold, double intensity, double distance)
+    public void move_advanced (double ypower, double xpower, double targetAngle, double threshold, double intensity, double distance)
     {
         double start = getEncoderAvg();
         while(Math.abs(getEncoderAvg() - start) < distance)
         {
-            frdrive.setPower((ypower + xpower) * getrcorrection(getAngle(), threshold, intensity));
-            brdrive.setPower((ypower - xpower) * getrcorrection(getAngle(), threshold, intensity));
-            fldrive.setPower(-(ypower - xpower) * getlcorrection(getAngle(), threshold, intensity));
-            bldrive.setPower(-(ypower + xpower) * getlcorrection(getAngle(), threshold, intensity));
+            frdrive.setPower((ypower + xpower) * getrcorrection(targetAngle, threshold, intensity));
+            brdrive.setPower((ypower - xpower) * getrcorrection(targetAngle, threshold, intensity));
+            fldrive.setPower(-(ypower - xpower) * getlcorrection(targetAngle, threshold, intensity));
+            bldrive.setPower(-(ypower + xpower) * getlcorrection(targetAngle, threshold, intensity));
         }
         stop_motors();
     }

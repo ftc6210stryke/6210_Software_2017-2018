@@ -20,7 +20,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="TeleOp v1.3", group="TeleOp")
-public class TeleOp_v1 extends OpMode
+public class TeleOp_v1 extends TeleOpLibrary_v1
 {
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor bldrive;
