@@ -151,30 +151,28 @@ public class TeleOp_v1 extends TeleOpLibrary_v1
             }
         } else {
 
-            if (Math.abs(gamepad1.left_stick_y) > .1)
-            {
+            if (Math.abs(gamepad1.left_stick_y) > .1) {
                 bldrive.setPower(-gamepad1.left_stick_y);
                 fldrive.setPower(-gamepad1.left_stick_y);
+            } else {
+                bldrive.setPower(0);
+                fldrive.setPower(0);
             }
-            else {bldrive.setPower(0);
-                fldrive.setPower(0);}
 
-            if (Math.abs(gamepad1.right_stick_y) > .1)
-            {
+            if (Math.abs(gamepad1.right_stick_y) > .1) {
                 brdrive.setPower(gamepad1.right_stick_y);
                 frdrive.setPower(gamepad1.right_stick_y);
+            } else {
+                brdrive.setPower(0);
+                frdrive.setPower(0);
             }
-            else {brdrive.setPower(0);
-                frdrive.setPower(0);}
 
         }
 
         // Mecanum-Tank Toggle
-        if (gamepad1.b && System.currentTimeMillis() - toggleguard > 500)
-        {
+        if (gamepad1.b && System.currentTimeMillis() - toggleguard > 500) {
             toggleguard = System.currentTimeMillis();
-            if (tank == false)
-            {
+            if (tank == false) {
                 tank = true;
             } else {
                 tank = false;
@@ -182,11 +180,9 @@ public class TeleOp_v1 extends TeleOpLibrary_v1
         }
 
         // toggle reduces drive speed to 2/3s power
-        if (gamepad1.y && System.currentTimeMillis() - toggleguard > 500)
-        {
+        if (gamepad1.y && System.currentTimeMillis() - toggleguard > 500) {
             toggleguard = System.currentTimeMillis();
-            if (drivePowerMod == 1)
-            {
+            if (drivePowerMod == 1) {
                 drivePowerMod = .5;
             } else {
                 drivePowerMod = 1;
@@ -195,7 +191,7 @@ public class TeleOp_v1 extends TeleOpLibrary_v1
 
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Joystick", "xpower (%.2f), ypower (%.2f)", xpower, ypower);
-
+    }
         public void elevator_up()   {
     }
 
