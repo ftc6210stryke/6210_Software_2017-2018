@@ -10,16 +10,11 @@ Holds methods to be used for Autonomous programs in FTC's Relic Recovery Competi
  */
 
 package org.firstinspires.ftc.teamcode;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gyroscope;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 public abstract class TeleOpLibrary_v1 extends OpMode {
     public DcMotor bldrive;
@@ -37,8 +32,7 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
     public double rturnpower;
     public double lturnpower;
     public double toggleguard;
-/** GRYO NEEDED    BNO055IMU imu;
-    Orientation angles;*/
+/** GRYO NEEDED    ModernRoboticsI2cGyro gyro;*/
 
     public void initialize()
     {
@@ -52,17 +46,11 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         rturnpower = 0;
         toggleguard = 0;
 
-/** GRYO NEEDED        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);*/
+/** GRYO NEEDED
+ *         gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
+        telemetry.log().add("Gyro Calibrating. Do Not Move!");
+        gyro.calibrate();
+        while (!isStopRequested() && gyro.isCalibrating()) {sleep(50);} */
 
         telemetry.addData("Status", "Initialized");
     }
@@ -208,7 +196,7 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
  *
     public double getAngle()
     {
-        return angles.firstAngle;
+ return gyro.rawZ();
     }
 
     //DO NOT SET POWER ABOVE .8 when using standard intensity (1)
