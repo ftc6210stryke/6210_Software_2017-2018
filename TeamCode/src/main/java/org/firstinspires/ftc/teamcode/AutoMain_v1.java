@@ -31,5 +31,9 @@ public class AutoMain_v1 extends AutoLibrary_v1{
         waitForStart();
         runtime.reset();
         //More later
+        double angle = getAngle();
+        move_advanced(.25, 0, angle, 3, 1, 200);
+        getGem(1, 3);
+        move_advanced(0, .25, angle, 3, 1, 200);
     }
 }
