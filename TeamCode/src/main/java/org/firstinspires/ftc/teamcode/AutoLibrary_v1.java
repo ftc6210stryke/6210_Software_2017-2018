@@ -172,8 +172,21 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         return rcorrection;
     }
 
-    //====================== ENCODER + GYRO MOVE ======================
+    //====================== Stationary Correction =====================
 
+    public void correct(double targetAngle, double threshold, double intensity)
+    {
+        if (Math.abs(targetAngle - getAngle()) > threshold) {
+            while (targetAngle - getAngle() > threshold) {
+                turn_basic(0.5);
+            }
+            while (targetAngle - getAngle() < threshold) {
+                turn_basic(-0.5);
+            }
+        }
+    }
+
+    //====================== ENCODER + GYRO MOVE ======================
     public void move_advanced (double ypower, double xpower, double targetAngle, double threshold, double intensity, double distance)
     {
         double start = getEncoderAvg();
