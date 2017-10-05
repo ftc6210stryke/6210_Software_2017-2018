@@ -11,42 +11,36 @@ Holds methods to be used for Autonomous programs in FTC's Relic Recovery Competi
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.Func;
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
-
-import java.util.Locale;
-
-import static com.sun.tools.doclint.Entity.pi;
-import static com.sun.tools.doclint.Entity.rceil;
+import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
+import com.qualcomm.robotcore.hardware.NormalizedRGBA;
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 public abstract class AutoLibrary_v1 extends LinearOpMode {
 
-    BNO055IMU imu;
-    Orientation angles;
+    ModernRoboticsI2cGyro gyro;
+    NormalizedColorSensor colorSensor;
+    NormalizedColorSensor gemSensor;
 
     public DcMotor bldrive;
     public DcMotor brdrive;
     public DcMotor fldrive;
     public DcMotor frdrive;
+    public DcMotor intake1;
+    public DcMotor intake2;
+    public DcMotor elevatorV1; //vexmotor
+    public DcMotor elevatorV2; //vexmotor
+    public DcMotor elevatorH1; //vexmotor
+    public DcMotor elevatorH2; //vexmotor
+
+    public Servo gemArm;
+    public Servo gemFlick;
 
     public void initialize()
     {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
         frdrive = hardwareMap.get(DcMotor.class, "a");
         fldrive = hardwareMap.get(DcMotor.class, "b");
         brdrive = hardwareMap.get(DcMotor.class, "c");
@@ -58,17 +52,17 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         brdrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bldrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "IMU";
-        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
+        gemSensor = hardwareMap.get(NormalizedColorSensor.class, "gemSensor");
+        gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
+        telemetry.log().add("Gyro Calibrating. Do Not Move!");
+        gyro.calibrate();
+        while (!isStopRequested() && gyro.isCalibrating()) {sleep(50);}
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        imu.initialize(parameters);
-        angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        waitForStart();
     }
 
     //====================== BASIC MOVEMENT METHODS ======================
@@ -223,6 +217,7 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
             fldrive.setPower(-(ypower - xpower) * PIDmod);
             bldrive.setPower(-(ypower + xpower) * PIDmod);
         }
+        stop_motors();
     }
 
     //======================= PID + GRYO =========================
@@ -248,60 +243,128 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
             fldrive.setPower(-(ypower - xpower) * PIDmod * getlcorrection(getAngle(), thresholdGyro, intensityGryo));
             bldrive.setPower(-(ypower + xpower) * PIDmod * getlcorrection(getAngle(), thresholdGyro, intensityGryo));
         }
+        stop_motors();
     }
 
+    //====================== SPECIALIZED MOVEMENT / PATH-ING ========================
 
-    //====================== GYRO SUPPORT ======================
-
-    public double getAngle()
+    public void move2Line(double ypower, double xpower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed)
     {
-        return angles.firstAngle;
-    }
-
-    void composeTelemetry() {
-
-        telemetry.addAction(new Runnable() { @Override public void run()
+        double start = getEncoderAvg();
+        if(isRed)
         {
-            angles   = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
+            while(getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff)
+            {
+                frdrive.setPower((ypower + xpower) * getrcorrection(targetAngle, threshold, intensity));
+                brdrive.setPower((ypower - xpower) * getrcorrection(targetAngle, threshold, intensity));
+                fldrive.setPower(-(ypower - xpower) * getlcorrection(targetAngle, threshold, intensity));
+                bldrive.setPower(-(ypower + xpower) * getlcorrection(targetAngle, threshold, intensity));
+            }
+            stop_motors();
         }
-        });
-
-        telemetry.addLine()
-                .addData("status", new Func<String>() {
-                    @Override public String value() {
-                        return imu.getSystemStatus().toShortString();
-                    }
-                })
-                .addData("calib", new Func<String>() {
-                    @Override public String value() {
-                        return imu.getCalibrationStatus().toString();
-                    }
-                });
-
-        telemetry.addLine()
-                .addData("yaw", new Func<String>() {
-                    @Override public String value() {
-                        return formatAngle(angles.angleUnit, angles.firstAngle);
-                    }
-                })
-                .addData("roll", new Func<String>() {
-                    @Override public String value() {
-                        return formatAngle(angles.angleUnit, angles.secondAngle);
-                    }
-                })
-                .addData("pitch", new Func<String>() {
-                    @Override public String value() {
-                        return formatAngle(angles.angleUnit, angles.thirdAngle);
-                    }
-                });
+        else
+        {
+            while(getFloorBlue() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff)
+            {
+                frdrive.setPower((ypower + xpower) * getrcorrection(targetAngle, threshold, intensity));
+                brdrive.setPower((ypower - xpower) * getrcorrection(targetAngle, threshold, intensity));
+                fldrive.setPower(-(ypower - xpower) * getlcorrection(targetAngle, threshold, intensity));
+                bldrive.setPower(-(ypower + xpower) * getlcorrection(targetAngle, threshold, intensity));
+            }
+            stop_motors();
+        }
     }
 
-    String formatAngle(AngleUnit angleUnit, double angle) {
-        return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
+    //====================== MANIPULATORS ===================================
+
+    public void startIntake(double power)
+    {
+        intake1.setPower(power);
+        intake2.setPower(-power);
     }
 
-    String formatDegrees(double degrees){
-        return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
+    public void stopIntake()
+    {
+        startIntake(0);
+    }
+
+    public void elevatorUp(double power, double distance)
+    {
+        double start = elevatorV1.getCurrentPosition();
+        while(Math.abs(elevatorV1.getCurrentPosition() - start) < distance)
+        {
+            elevatorV1.setPower(power);
+            elevatorV2.setPower(-power);
+        }
+        elevatorV1.setPower(0);
+        elevatorV2.setPower(0);
+    }
+
+    public void output_start(double power)
+    {
+        elevatorH1.setPower(power);
+        elevatorH2.setPower(power);
+    }
+
+    public void output_stop()
+    {
+        output_start(0);
+    }
+
+    public void getGem(double extension, double threshold)
+    {
+        double start = gemArm.getPosition();
+        gemArm.setPosition(extension);
+        if(getBlue() > threshold && getRed() < threshold)
+        {
+            gemFlick.setPosition(1);
+        }
+        else if (getRed() > threshold && getBlue() < threshold)
+        {
+            gemFlick.setPosition(0);
+        }
+        sleep(250);
+        gemFlick.setPosition(.5);
+        sleep(250);
+        gemArm.setPosition(start);
+    }
+
+    public void relic()
+    {
+        //empty
+    }
+
+    //====================== SENSORS ======================
+
+    public double getAngle() {return gyro.rawZ();}
+
+    public double getRed()
+    {
+        NormalizedRGBA colors = gemSensor.getNormalizedColors();
+        return colors.red;
+    }
+
+    public double getBlue()
+    {
+        NormalizedRGBA colors = gemSensor.getNormalizedColors();
+        return colors.blue;
+    }
+
+    public double getBrightness()
+    {
+        NormalizedRGBA colors = gemSensor.getNormalizedColors();
+        return colors.alpha;
+    }
+
+    public double getFloorRed()
+    {
+        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+        return colors.red;
+    }
+
+    public double getFloorBlue()
+    {
+        NormalizedRGBA colors = colorSensor.getNormalizedColors();
+        return colors.blue;
     }
 }
