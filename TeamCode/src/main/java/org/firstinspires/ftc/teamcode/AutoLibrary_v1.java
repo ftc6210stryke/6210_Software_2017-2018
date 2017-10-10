@@ -1,6 +1,6 @@
 /*
-AutoMain_v1
-9/18/2017
+AutoLibrary_v1
+September 2017
 6210 Software
 - William Fisher
 - Rohit Chawla
@@ -18,12 +18,25 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
+
 
 public abstract class AutoLibrary_v1 extends LinearOpMode {
 
     ModernRoboticsI2cGyro gyro;
     NormalizedColorSensor colorSensor;
     NormalizedColorSensor gemSensor;
+
+    public static final String TAG = "Vuforia VuMark Sample";
+    OpenGLMatrix lastLocation = null;
+    VuforiaLocalizer vuforia;
+    VuforiaTrackable relicTemplate;
+    VuforiaTrackables relicTrackables;
 
     public DcMotor bldrive;
     public DcMotor brdrive;
@@ -52,6 +65,8 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         brdrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bldrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
+        vision_init();
+
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
         gemSensor = hardwareMap.get(NormalizedColorSensor.class, "gemSensor");
         gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
@@ -63,6 +78,18 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         telemetry.update();
 
         waitForStart();
+    }
+
+    public void vision_init ()
+    {
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        parameters.vuforiaLicenseKey = "ARUX4tP/////AAAAGXY2Dg+/sUl6gWdYntfHvN8GT9v/tqySPvCz3Nt2dTXFWQC7TJriGnCTY/vvHRRUFiSSI11yfUxGSTkNzXbHM0zBmGf3WiW6+kZsArc76UHXbUG1fHmPyIAljbqRBiNz8Kki/PlrJCwpNwmcZKNu8wvnYzGZ5phfZHXE6yyr2HvuEyX6IEYUvrvDtMImiHWHSbjK5wbgDyMinQU/FsVmDy0S1OHL+xVDk6yhjBsPBO2bsVMTKA3GRZAo+Qxjqd9nh95+jPt1EbE11VgPHzr/Zm8bKrr+gz24uxfsTgXU3sc6YLgdcegkRd6dxM5gvsu4xisSks+gkLismFPmNASP0JpDkom80KZ9MmEcbl7GnLO+";
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
+        this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+        VuforiaTrackable relicTemplate = relicTrackables.get(0);
+        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
     }
 
     //====================== BASIC MOVEMENT METHODS ======================
@@ -166,16 +193,14 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         return rcorrection;
     }
 
-    //====================== Stationary Correction =====================
-
-    public void correct(double targetAngle, double threshold, double intensity)
+    public void turn_gyro(double power, double targetAngle, double threshold)
     {
         if (Math.abs(targetAngle - getAngle()) > threshold) {
             while (targetAngle - getAngle() > threshold) {
-                turn_basic(0.5);
+                turn_basic(power);
             }
             while (targetAngle - getAngle() < threshold) {
-                turn_basic(-0.5);
+                turn_basic(-power);
             }
         }
     }
@@ -366,5 +391,13 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
     {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         return colors.blue;
+    }
+
+    //can return RelicRecoveryVuMark.UNKNOWN, R-.RIGHT, R-.LEFT, or R-.CENTER
+    public RelicRecoveryVuMark getSymbol()
+    {
+        relicTrackables.activate();
+        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+        return vuMark;
     }
 }
