@@ -52,8 +52,7 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
     public Servo gemArm;
     public Servo gemFlick;
 
-    public void initialize()
-    {
+    public void initialize() {
         frdrive = hardwareMap.get(DcMotor.class, "a");
         fldrive = hardwareMap.get(DcMotor.class, "b");
         brdrive = hardwareMap.get(DcMotor.class, "c");
@@ -72,7 +71,9 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
         telemetry.log().add("Gyro Calibrating. Do Not Move!");
         gyro.calibrate();
-        while (!isStopRequested() && gyro.isCalibrating()) {sleep(50);}
+        while (!isStopRequested() && gyro.isCalibrating()) {
+            sleep(50);
+        }
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -80,8 +81,7 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         waitForStart();
     }
 
-    public void vision_init ()
-    {
+    public void vision_init() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "ARUX4tP/////AAAAGXY2Dg+/sUl6gWdYntfHvN8GT9v/tqySPvCz3Nt2dTXFWQC7TJriGnCTY/vvHRRUFiSSI11yfUxGSTkNzXbHM0zBmGf3WiW6+kZsArc76UHXbUG1fHmPyIAljbqRBiNz8Kki/PlrJCwpNwmcZKNu8wvnYzGZ5phfZHXE6yyr2HvuEyX6IEYUvrvDtMImiHWHSbjK5wbgDyMinQU/FsVmDy0S1OHL+xVDk6yhjBsPBO2bsVMTKA3GRZAo+Qxjqd9nh95+jPt1EbE11VgPHzr/Zm8bKrr+gz24uxfsTgXU3sc6YLgdcegkRd6dxM5gvsu4xisSks+gkLismFPmNASP0JpDkom80KZ9MmEcbl7GnLO+";
@@ -94,40 +94,35 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
 
     //====================== BASIC MOVEMENT METHODS ======================
 
-    public void move_yaxis_basic(double power)
-    {
+    public void move_yaxis_basic(double power) {
         frdrive.setPower(power);
         brdrive.setPower(power);
         fldrive.setPower(-power);
         bldrive.setPower(-power);
     }
 
-    public void move_x_axis_basic(double power)
-    {
+    public void move_x_axis_basic(double power) {
         frdrive.setPower(power);
         brdrive.setPower(-power);
         fldrive.setPower(power);
         bldrive.setPower(-power);
     }
 
-    public void move_biaxis_basic(double ypower, double xpower)
-    {
+    public void move_biaxis_basic(double ypower, double xpower) {
         frdrive.setPower(ypower + xpower);
         brdrive.setPower(ypower - xpower);
         fldrive.setPower(-(ypower - xpower));
         bldrive.setPower(-(ypower + xpower));
     }
 
-    public void turn_basic(double power)
-    {
+    public void turn_basic(double power) {
         frdrive.setPower(-power);
         brdrive.setPower(-power);
         fldrive.setPower(-power);
         brdrive.setPower(-power);
     }
 
-    public void stop_motors()
-    {
+    public void stop_motors() {
         frdrive.setPower(0);
         brdrive.setPower(0);
         fldrive.setPower(0);
@@ -136,26 +131,21 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
 
     //====================== ENCODER ONLY MOVEMENT METHODS ======================
 
-    public double getEncoderAvg()
-    {
-        return ((frdrive.getCurrentPosition() + fldrive.getCurrentPosition())/2);
+    public double getEncoderAvg() {
+        return ((frdrive.getCurrentPosition() + fldrive.getCurrentPosition()) / 2);
     }
 
-    public void move_encoder(double ypower, double xpower, double distance)
-    {
+    public void move_encoder(double ypower, double xpower, double distance) {
         double start = getEncoderAvg();
-        while(Math.abs(getEncoderAvg() - start) < distance)
-        {
+        while (Math.abs(getEncoderAvg() - start) < distance) {
             move_biaxis_basic(ypower, xpower);
         }
         stop_motors();
     }
 
-    public void turn_encoder(double power, double distance)
-    {
+    public void turn_encoder(double power, double distance) {
         double start = getEncoderAvg();
-        while(Math.abs(getEncoderAvg() - start) < distance)
-        {
+        while (Math.abs(getEncoderAvg() - start) < distance) {
             turn_basic(power);
         }
         stop_motors();
@@ -165,36 +155,45 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
 
     //DO NOT SET POWER ABOVE .8 when using standard intensity (1)
     //Intensity should be a decimal number close to 1, not greater than 1.5
-    public double getlcorrection(double targetAngle, double threshold, double intensity)
-    {
+    public double getlcorrection(double targetAngle, double threshold, double intensity) {
         double lcorrection = 1;
-        if (targetAngle - getAngle() > threshold)
-        {
-            lcorrection = 1 - Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity/6.28;
-        }
-        else if (targetAngle - getAngle() < -threshold)
-        {
-            lcorrection = 1 + Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity/6.28;
+        if (targetAngle - getAngle() > threshold) {
+            lcorrection = 1 - Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
+        } else if (targetAngle - getAngle() < -threshold) {
+            lcorrection = 1 + Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
         }
         return lcorrection;
     }
 
-    public double getrcorrection(double targetAngle, double threshold, double intensity)
-    {
+    public double getrcorrection(double targetAngle, double threshold, double intensity) {
         double rcorrection = 1;
-        if (targetAngle - getAngle() > threshold)
-        {
-            rcorrection = 1 + Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity/6.28;
-        }
-        else if (targetAngle - getAngle() < -threshold)
-        {
-            rcorrection = 1 - Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity/6.28;
+        if (targetAngle - getAngle() > threshold) {
+            rcorrection = 1 + Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
+        } else if (targetAngle - getAngle() < -threshold) {
+            rcorrection = 1 - Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
         }
         return rcorrection;
     }
 
-    public void turn_gyro(double power, double targetAngle, double threshold)
+    public double angleRelatiivetoAbsolute(double currentAngle, double changeInAngle)
     {
+        double trueAngle = 0;
+        if (currentAngle + changeInAngle >= 0 && currentAngle + changeInAngle < 360)
+        {
+            return currentAngle - changeInAngle;
+        }
+        else if (currentAngle + changeInAngle >= 0)
+        {
+            trueAngle =  360 + currentAngle + changeInAngle;
+        }
+        else
+        {
+            trueAngle = currentAngle + changeInAngle - 360;
+        }
+        return trueAngle;
+    }
+
+    public void turn_gyro(double power, double targetAngle, double threshold) {
         if (Math.abs(targetAngle - getAngle()) > threshold) {
             while (targetAngle - getAngle() > threshold) {
                 turn_basic(power);
@@ -206,11 +205,9 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
     }
 
     //====================== ENCODER + GYRO MOVE ======================
-    public void move_advanced (double ypower, double xpower, double targetAngle, double threshold, double intensity, double distance)
-    {
+    public void move_advanced(double ypower, double xpower, double targetAngle, double threshold, double intensity, double distance) {
         double start = getEncoderAvg();
-        while(Math.abs(getEncoderAvg() - start) < distance)
-        {
+        while (Math.abs(getEncoderAvg() - start) < distance) {
             frdrive.setPower((ypower + xpower) * getrcorrection(targetAngle, threshold, intensity));
             brdrive.setPower((ypower - xpower) * getrcorrection(targetAngle, threshold, intensity));
             fldrive.setPower(-(ypower - xpower) * getlcorrection(targetAngle, threshold, intensity));
@@ -221,21 +218,19 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
 
     //====================== PID =============================
 
-    public void move_PID (double ypower, double xpower, double kporp, double kintg, double kderv, double distance, double threshold)
-    {
+    public void move_PID(double ypower, double xpower, double kporp, double kintg, double kderv, double distance, double threshold) {
         double error = distance;
         double totalError = 0;
         double prevTime = System.currentTimeMillis();
-        while (Math.abs(error) > threshold)
-        {
+        while (Math.abs(error) > threshold) {
             double currTime = System.currentTimeMillis();
             double deltaTime = currTime - prevTime;
             prevTime = currTime;
             error = distance - getEncoderAvg();
-            totalError = error*deltaTime;
-            double prop = kporp*error;
-            double intg = kintg*totalError;
-            double derv = kderv*(error/deltaTime);
+            totalError = error * deltaTime;
+            double prop = kporp * error;
+            double intg = kintg * totalError;
+            double derv = kderv * (error / deltaTime);
             double PIDmod = prop + intg + derv;
             frdrive.setPower((ypower + xpower) * PIDmod);
             brdrive.setPower((ypower - xpower) * PIDmod);
@@ -247,21 +242,19 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
 
     //======================= PID + GRYO =========================
 
-    public void move_advancedplus (double ypower, double xpower, double kporp, double kintg, double kderv, double distance, double thresholdPID, double thresholdGyro, double intensityGryo)
-    {
+    public void move_advancedplus(double ypower, double xpower, double kporp, double kintg, double kderv, double distance, double thresholdPID, double thresholdGyro, double intensityGryo) {
         double error = distance;
         double totalError = 0;
         double prevTime = System.currentTimeMillis();
-        while (Math.abs(error) > thresholdPID)
-        {
+        while (Math.abs(error) > thresholdPID) {
             double currTime = System.currentTimeMillis();
             double deltaTime = currTime - prevTime;
             prevTime = currTime;
             error = distance - getEncoderAvg();
-            totalError = error*deltaTime;
-            double prop = kporp*error;
-            double intg = kintg*totalError;
-            double derv = kderv*(error/deltaTime);
+            totalError = error * deltaTime;
+            double prop = kporp * error;
+            double intg = kintg * totalError;
+            double derv = kderv * (error / deltaTime);
             double PIDmod = prop + intg + derv;
             frdrive.setPower((ypower + xpower) * PIDmod * getrcorrection(getAngle(), thresholdGyro, intensityGryo));
             brdrive.setPower((ypower - xpower) * PIDmod * getrcorrection(getAngle(), thresholdGyro, intensityGryo));
@@ -273,51 +266,42 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
 
     //====================== SPECIALIZED MOVEMENT / PATH-ING ========================
 
-    public void move2Line(double ypower, double xpower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed)
-    {
+    public void move2Line(double ypower, double xpower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed) {
         double start = getEncoderAvg();
-        if(isRed)
-        {
-            while(getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff)
-            {
+        if (isRed) {
+            while (getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff) {
                 frdrive.setPower((ypower + xpower) * getrcorrection(targetAngle, threshold, intensity));
                 brdrive.setPower((ypower - xpower) * getrcorrection(targetAngle, threshold, intensity));
                 fldrive.setPower(-(ypower - xpower) * getlcorrection(targetAngle, threshold, intensity));
                 bldrive.setPower(-(ypower + xpower) * getlcorrection(targetAngle, threshold, intensity));
             }
             stop_motors();
-        }
-        else
-        {
-            while(getFloorBlue() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff)
-            {
+        } else {
+            while (getFloorBlue() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff) {
                 frdrive.setPower((ypower + xpower) * getrcorrection(targetAngle, threshold, intensity));
                 brdrive.setPower((ypower - xpower) * getrcorrection(targetAngle, threshold, intensity));
                 fldrive.setPower(-(ypower - xpower) * getlcorrection(targetAngle, threshold, intensity));
                 bldrive.setPower(-(ypower + xpower) * getlcorrection(targetAngle, threshold, intensity));
             }
-            stop_motors();
+
         }
+        stop_motors();
     }
 
     //====================== MANIPULATORS ===================================
 
-    public void startIntake(double power)
-    {
+    public void startIntake(double power) {
         intake1.setPower(power);
         intake2.setPower(-power);
     }
 
-    public void stopIntake()
-    {
+    public void stopIntake() {
         startIntake(0);
     }
 
-    public void elevatorUp(double power, double distance)
-    {
+    public void elevatorUp(double power, double distance) {
         double start = elevatorV1.getCurrentPosition();
-        while(Math.abs(elevatorV1.getCurrentPosition() - start) < distance)
-        {
+        while (Math.abs(elevatorV1.getCurrentPosition() - start) < distance) {
             elevatorV1.setPower(power);
             elevatorV2.setPower(-power);
         }
@@ -325,27 +309,21 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         elevatorV2.setPower(0);
     }
 
-    public void output_start(double power)
-    {
+    public void output_start(double power) {
         elevatorH1.setPower(power);
         elevatorH2.setPower(power);
     }
 
-    public void output_stop()
-    {
+    public void output_stop() {
         output_start(0);
     }
 
-    public void getGem(double extension, double threshold)
-    {
+    public void getGem(double extension, double threshold) {
         double start = gemArm.getPosition();
         gemArm.setPosition(extension);
-        if(getBlue() > threshold && getRed() < threshold)
-        {
+        if (getBlue() > threshold && getRed() < threshold) {
             gemFlick.setPosition(1);
-        }
-        else if (getRed() > threshold && getBlue() < threshold)
-        {
+        } else if (getRed() > threshold && getBlue() < threshold) {
             gemFlick.setPosition(0);
         }
         sleep(250);
@@ -354,50 +332,59 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         gemArm.setPosition(start);
     }
 
-    public void relic()
-    {
+    public void relic() {
         //empty
     }
 
     //====================== SENSORS ======================
 
-    public double getAngle() {return gyro.rawZ();}
+    public double getAngle() {
+        return gyro.rawZ();
+    }
 
-    public double getRed()
-    {
+    public double getRed() {
         NormalizedRGBA colors = gemSensor.getNormalizedColors();
         return colors.red;
     }
 
-    public double getBlue()
-    {
+    public double getBlue() {
         NormalizedRGBA colors = gemSensor.getNormalizedColors();
         return colors.blue;
     }
 
-    public double getBrightness()
-    {
+    public double getBrightness() {
         NormalizedRGBA colors = gemSensor.getNormalizedColors();
         return colors.alpha;
     }
 
-    public double getFloorRed()
-    {
+    public double getFloorRed() {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         return colors.red;
     }
 
-    public double getFloorBlue()
-    {
+    public double getFloorBlue() {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         return colors.blue;
     }
 
     //can return RelicRecoveryVuMark.UNKNOWN, R-.RIGHT, R-.LEFT, or R-.CENTER
-    public RelicRecoveryVuMark getSymbol()
+    public RelicRecoveryVuMark getSymbol() {
+        relicTrackables.activate();
+        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
+        relicTrackables.deactivate();
+        return vuMark;
+    }
+
+    public RelicRecoveryVuMark getSymbol_multitry(int tries, double angle)
     {
         relicTrackables.activate();
         RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
-        return vuMark;
+        for (int i = 1; i < tries; i++) {
+            if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
+                turn_gyro(.2, angle, 2);
+                vuMark = RelicRecoveryVuMark.from(relicTemplate);
+            }
+        }
+        return  vuMark;
     }
 }

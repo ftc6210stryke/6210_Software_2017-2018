@@ -38,7 +38,7 @@ public class AutoBlueInner_v1 extends AutoLibrary_v1{
         turn_gyro(.3, angle, 3);
         getGem(1, 3);
         move_advanced(0, .25, angle, 3, 1, 200);
-        targetColumn = getSymbol();
+        targetColumn = getSymbol_multitry(3, angle);
         move_advanced(0, .25, angle, 3, 1, 400);
         angle = angle - 90;
         turn_gyro(.7, angle, 3);
