@@ -21,12 +21,12 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
     public DcMotor brdrive;
     public DcMotor fldrive;
     public DcMotor frdrive;
-    public DcMotor intake1;
+/**    public DcMotor intake1;
     public DcMotor intake2;
     public DcMotor elevatorV1; //vexmotor
     public DcMotor elevatorV2; //vexmotor
     public DcMotor elevatorH1; //vexmotor
-    public DcMotor elevatorH2; //vexmotor
+    public DcMotor elevatorH2; //vexmotor **/
     public double ypower;
     public double xpower;
     public double rturnpower;
@@ -40,6 +40,10 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         bldrive = hardwareMap.get(DcMotor.class, "d");
         frdrive  = hardwareMap.get(DcMotor.class, "a");
         fldrive = hardwareMap.get(DcMotor.class, "b");
+        /**
+         * intake1 = hardwareMap.get(DcMotor.class, "i1");
+         * intake2 = hardwareMap.get(DcMotor.class, "i2");
+         */
         xpower = 0;
         ypower = 0;
         lturnpower = 0;
@@ -232,7 +236,7 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
     }
 */
 
-//====================================== MANIPULATORS METHODS =================================
+/*//====================================== MANIPULATORS METHODS =================================
 
     public void intake(boolean control)
     {
@@ -278,7 +282,7 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
     public void relic()
     {
         //empty
-    }
+    }*/
 
 
 // ===================================== UTILITY METHODS ==================================

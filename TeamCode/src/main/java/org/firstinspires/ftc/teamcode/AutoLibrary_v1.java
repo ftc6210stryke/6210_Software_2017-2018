@@ -175,33 +175,20 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         return rcorrection;
     }
 
-    public double angleRelatiivetoAbsolute(double currentAngle, double changeInAngle)
-    {
-        double trueAngle = 0;
-        if (currentAngle + changeInAngle >= 0 && currentAngle + changeInAngle < 360)
+    public void turn_gyro(double power, double targetAngle, double threshold) {
+        while (Math.abs(targetAngle - getAngle()) > threshold)
         {
-            return currentAngle - changeInAngle;
+            turn_basic(power);
         }
-        else if (currentAngle + changeInAngle >= 0)
-        {
-            trueAngle =  360 + currentAngle + changeInAngle;
-        }
-        else
-        {
-            trueAngle = currentAngle + changeInAngle - 360;
-        }
-        return trueAngle;
     }
 
-    public void turn_gyro(double power, double targetAngle, double threshold) {
-        if (Math.abs(targetAngle - getAngle()) > threshold) {
-            while (targetAngle - getAngle() > threshold) {
-                turn_basic(power);
-            }
-            while (targetAngle - getAngle() < threshold) {
-                turn_basic(-power);
-            }
+    //Finds angles relative to 0 instead to avoid issues with 360 to 0 gap
+    public double angle_delta(double currentAngle, double targetAngle) {
+        double delta = Math.abs(currentAngle - targetAngle);
+        if (Math.abs(delta) > 180) {
+            delta -= 360;
         }
+        return delta;
     }
 
     //====================== ENCODER + GYRO MOVE ======================
