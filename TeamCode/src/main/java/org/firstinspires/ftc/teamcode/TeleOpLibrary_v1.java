@@ -10,10 +10,17 @@ Holds methods to be used for Autonomous programs in FTC's Relic Recovery Competi
  */
 
 package org.firstinspires.ftc.teamcode;
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Gyroscope;
+
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 
 public abstract class TeleOpLibrary_v1 extends OpMode {
@@ -32,7 +39,10 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
     public double rturnpower;
     public double lturnpower;
     public double toggleguard;
-/** GRYO NEEDED    ModernRoboticsI2cGyro gyro;*/
+    public double angle;
+    BNO055IMU gyro;
+    Orientation angles;
+    Acceleration gravity;
 
     public void initialize()
     {
@@ -50,22 +60,22 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         rturnpower = 0;
         toggleguard = 0;
 
-/** GRYO NEEDED
- *         gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
-        telemetry.log().add("Gyro Calibrating. Do Not Move!");
-        gyro.calibrate();
-        while (!isStopRequested() && gyro.isCalibrating()) {sleep(50);} */
-
-        telemetry.addData("Status", "Initialized");
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "GRYO";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        gyro = hardwareMap.get(BNO055IMU.class, "gyro");
+        gyro.initialize(parameters);
     }
 
 // ================================= MOVEMENT METHODS ==============================
 
-    public void drive_mecanum(double drivePowerMod/**, GYRO NEEDED double angle*/) {
+    public void drive_mecanum(double drivePowerMod) {
         xpower = getMecanumPower1(false);
         ypower = getMecanumPower1(true);
-
-        /** GRYO NEEDED double newAngle = angle;*/
 
         rturnpower = gamepad1.right_trigger;
         lturnpower = gamepad1.left_trigger;
@@ -74,13 +84,13 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         if (rturnpower > .1)
         {
             turn(true, drivePowerMod);
-            /** GRYO NEEDED newAngle = getAngle();*/
+            angle = getAngle();
         }
         //If lturnpower if greater than .1, turn left
         else if (lturnpower > .1)
         {
             turn(false, drivePowerMod);
-            /** GRYO NEEDED newAngle = getAngle();*/
+            angle = getAngle();
         }
         //if either joystick is over .1, engage mecanum drive
         else if (Math.abs(gamepad1.right_stick_x) > .1 || Math.abs(gamepad1.right_stick_y) > .1)
@@ -91,8 +101,8 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
             //as long as subtpower is over .1 (so as not to take sqaureroot of zero) power subt motors
             if (Math.abs(subtpower) > .1)
             {
-                fldrive.setPower(-getMecanumPower2(subtpower, drivePowerMod)/** GRYO NEEDED * getlcorrection(newAngle, 3, 1.2)*/);
-                brdrive.setPower(getMecanumPower2(subtpower, drivePowerMod)/** GRYO NEEDED * getrcorrection(newAngle, 3, 1.2)*/);
+                fldrive.setPower(-getMecanumPower2(subtpower, drivePowerMod) - getlcorrection(angle, 3, 1.2) * subtpower/subtpower);
+                brdrive.setPower(getMecanumPower2(subtpower, drivePowerMod) + getrcorrection(angle, 3, 1.2) * subtpower/subtpower);
             }
             //otherwise, subtpower motors are turned off
             else
@@ -103,8 +113,8 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
             //as long as pluspower is over .1 (so as not to take sqaureroot of zero) power plus motors
             if (Math.abs(pluspower) > .1)
             {
-                frdrive.setPower(getMecanumPower2(pluspower, drivePowerMod)/** GRYO NEEDED * getrcorrection(angle, 3, 1.2)*/);
-                bldrive.setPower(-getMecanumPower2(pluspower, drivePowerMod)/** GYRO NEEDED * getlcorrection(angle, 3, 1.2)*/);
+                frdrive.setPower(getMecanumPower2(pluspower, drivePowerMod) + getrcorrection(angle, 3, 1.2) * pluspower/pluspower);
+                bldrive.setPower(-getMecanumPower2(pluspower, drivePowerMod) - getlcorrection(angle, 3, 1.2) * pluspower/pluspower);
             }
             //otherwise, pluspower motors are turned off
             else
@@ -196,11 +206,12 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
             frdrive.setPower(0);
         }
     }
-/** GRYO METHODS : GRYO NEEDED
- *
+
+//    ========= GYRO METHODS =================
     public double getAngle()
     {
- return gyro.rawZ();
+        angles   = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return angles.firstAngle;
     }
 
     //DO NOT SET POWER ABOVE .8 when using standard intensity (1)
@@ -210,11 +221,11 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         double lcorrection = 1;
         if (targetAngle - getAngle() > threshold)
         {
-            lcorrection = 1 - Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity/6.28;
+            lcorrection = Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity/6.28;
         }
         else if (targetAngle - getAngle() < -threshold)
         {
-            lcorrection = 1 + Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity/6.28;
+            lcorrection = -Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity/6.28;
         }
         return lcorrection;
     }
@@ -226,15 +237,14 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         double rcorrection = 1;
         if (targetAngle - getAngle() > threshold)
         {
-            rcorrection = 1 + Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity/6.28;
+            rcorrection = -Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity/6.28;
         }
         else if (targetAngle - getAngle() < -threshold)
         {
-            rcorrection = 1 - Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity/6.28;
+            rcorrection = Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity/6.28;
         }
         return rcorrection;
     }
-*/
 
 /*//====================================== MANIPULATORS METHODS =================================
 
