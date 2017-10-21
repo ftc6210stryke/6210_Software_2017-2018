@@ -71,11 +71,14 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         gyro.initialize(parameters);
 
         angle = getAngle();
+
+        telemetry.addLine("Init complete");
+        telemetry.update();
     }
 
 // ================================= MOVEMENT METHODS ==============================
 
-    public void drive_mecanum(double drivePowerMod) {
+    public void drive_mecanum(double drivePowerMod, boolean correction_active) {
         xpower = getMecanumPower1(false);
         ypower = getMecanumPower1(true);
 
@@ -103,8 +106,8 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
             //as long as subtpower is over .1 (so as not to take sqaureroot of zero) power subt motors
             if (Math.abs(subtpower) > .1)
             {
-                fldrive.setPower(-getMecanumPower2(subtpower, drivePowerMod) * getflcorrection(ypower, xpower, angle, 10, 1));
-                brdrive.setPower(getMecanumPower2(subtpower, drivePowerMod) * getbrcorrection(ypower, xpower, angle, 10, 1));
+                fldrive.setPower(-getMecanumPower2(subtpower, drivePowerMod) * getflcorrection(ypower, xpower, angle, 3, 1, correction_active));
+                brdrive.setPower(getMecanumPower2(subtpower, drivePowerMod) * getbrcorrection(ypower, xpower, angle, 3, 1, correction_active));
             }
             //otherwise, subtpower motors are turned off
             else
@@ -115,8 +118,8 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
             //as long as pluspower is over .1 (so as not to take sqaureroot of zero) power plus motors
             if (Math.abs(pluspower) > .1)
             {
-                frdrive.setPower(getMecanumPower2(pluspower, drivePowerMod) * getfrcorrection(ypower, xpower, angle, 10, 1));
-                bldrive.setPower(-getMecanumPower2(pluspower, drivePowerMod) * getblcorrection(ypower, xpower, angle, 10, 1));
+                frdrive.setPower(getMecanumPower2(pluspower, drivePowerMod) * getfrcorrection(ypower, xpower, angle, 3, 1, correction_active));
+                bldrive.setPower(-getMecanumPower2(pluspower, drivePowerMod) * getblcorrection(ypower, xpower, angle, 3, 1, correction_active));
             }
             //otherwise, pluspower motors are turned off
             else
@@ -124,9 +127,6 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
                 fldrive.setPower(0);
                 brdrive.setPower(0);
             }
-            telemetry.addData("xpower", xpower);
-            telemetry.addData("ypower", ypower);
-            telemetry.update();
         }
         //if not input from triggers or stick, turn motors off
         else
@@ -136,6 +136,12 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
             bldrive.setPower(0);
             brdrive.setPower(0);
         }
+        telemetry.addData("angle", getAngle());
+        telemetry.addData("angle to 0", angle_delta(getAngle(), 0));
+        telemetry.addData("FR correction", getfrcorrection(ypower, xpower, angle, 3, 1, true));
+        telemetry.addData("xpower", xpower);
+        telemetry.addData("ypower", ypower);
+        telemetry.update();
     }
 
     //Determine initial power from squaring the gamestick multipled by +/-
@@ -147,7 +153,7 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         {
             if (Math.abs(gamepad1.right_stick_y) > .1)
             {
-                output = Math.pow(gamepad1.right_stick_y, 2) * gamepad1.right_stick_y / Math.abs(gamepad1.right_stick_y);
+                output = -Math.pow(gamepad1.right_stick_y, 2) * gamepad1.right_stick_y / Math.abs(gamepad1.right_stick_y);
                 //if output is greater than .45, reduce to .45 to prevent going over 1
                 if (Math.abs(output) > .45)
                 {
@@ -180,16 +186,16 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
     {
         if(isRight)
         {
-            frdrive.setPower(rturnpower * drivePowerMod);
-            fldrive.setPower(rturnpower * drivePowerMod);
-            brdrive.setPower(rturnpower * drivePowerMod);
-            bldrive.setPower(rturnpower * drivePowerMod);
+            frdrive.setPower(-rturnpower * drivePowerMod);
+            fldrive.setPower(-rturnpower * drivePowerMod);
+            brdrive.setPower(-rturnpower * drivePowerMod);
+            bldrive.setPower(-rturnpower * drivePowerMod);
         } else
         {
-            frdrive.setPower(-lturnpower * drivePowerMod);
-            fldrive.setPower(-lturnpower * drivePowerMod);
-            brdrive.setPower(-lturnpower * drivePowerMod);
-            bldrive.setPower(-lturnpower * drivePowerMod);
+            frdrive.setPower(lturnpower * drivePowerMod);
+            fldrive.setPower(lturnpower * drivePowerMod);
+            brdrive.setPower(lturnpower * drivePowerMod);
+            bldrive.setPower(lturnpower * drivePowerMod);
         }
     }
 
@@ -221,68 +227,77 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
 
     public double angle_delta(double currentAngle, double targetAngle) {
         double delta = targetAngle - currentAngle;
-        if (delta < 180) {
+        if (delta < -180) {
             delta += 360;
         }
         else if (delta > 180)
         {
-            delta -= 180;
+            delta -= 360;
         }
         return delta;
     }
 
-    public double getfrcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity)
+    public double getfrcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity, boolean active)
     {
         double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < threshold)
-        {
-            output = 1 + Math.pow(getMecanumPower2(ypower-xpower, 1), .3) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        }
-        else if (angle_delta(getAngle(), targetAngle) > threshold)
-        {
-            output = 1 - Math.pow(getMecanumPower2(ypower-xpower, 1), .3) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        if (active) {
+            if (angle_delta(getAngle(), targetAngle) < threshold)
+            {
+                output = 1 + (ypower - xpower) / Math.abs(ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+            }
+            else if (angle_delta(getAngle(), targetAngle) > threshold)
+            {
+                output = 1 - (ypower - xpower) / Math.abs(ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+            }
         }
         return output;
     }
 
-    public double getbrcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity)
+    public double getbrcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity, boolean active)
     {
         double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < threshold)
+        if (active)
         {
-            output = 1 + Math.pow(getMecanumPower2(ypower+xpower, 1), .3) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        }
-        else if (angle_delta(getAngle(), targetAngle) > threshold)
-        {
-            output = 1 - Math.pow(getMecanumPower2(ypower+xpower, 1), .3) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+            if (angle_delta(getAngle(), targetAngle) < threshold)
+            {
+                output = 1 + (ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+            } else if (angle_delta(getAngle(), targetAngle) > threshold)
+            {
+                output = 1 - (ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+            }
         }
         return output;
     }
 
-    public double getflcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity)
+    public double getflcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity, boolean active)
     {
         double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < threshold)
+        if (active)
         {
-            output = 1 + Math.pow(getMecanumPower2(-ypower-xpower, 1), .3) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        }
-        else if (angle_delta(getAngle(), targetAngle) > threshold)
-        {
-            output = 1 - Math.pow(getMecanumPower2(-ypower-xpower, 1), .3) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+            if (angle_delta(getAngle(), targetAngle) < threshold)
+            {
+                output = 1 + (-ypower - xpower) / Math.abs(-ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+            }
+            else if (angle_delta(getAngle(), targetAngle) > threshold)
+            {
+                output = 1 - (-ypower - xpower) / Math.abs(-ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+            }
         }
         return output;
     }
 
-    public double getblcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity)
+    public double getblcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity, boolean active)
     {
         double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < threshold)
-        {
-            output = 1 + Math.pow(getMecanumPower2(-ypower+xpower, 1), .3) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        }
-        else if (angle_delta(getAngle(), targetAngle) > threshold)
-        {
-            output = 1 - Math.pow(getMecanumPower2(-ypower+xpower, 1), .3) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        if (active) {
+            if (angle_delta(getAngle(), targetAngle) < threshold)
+            {
+                output = 1 + (-ypower + xpower) / Math.abs(-ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+            }
+            else if (angle_delta(getAngle(), targetAngle) > threshold)
+            {
+                output = 1 - (-ypower + xpower) / Math.abs(-ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+            }
         }
         return output;
     }
