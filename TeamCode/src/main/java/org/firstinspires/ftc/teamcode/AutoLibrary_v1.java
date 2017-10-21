@@ -11,6 +11,8 @@ Holds methods to be used for Autonomous programs in FTC's Relic Recovery Competi
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.hardware.modernrobotics.ModernRoboticsI2cGyro;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,6 +22,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
@@ -28,7 +35,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 public abstract class AutoLibrary_v1 extends LinearOpMode {
 
-    ModernRoboticsI2cGyro gyro;
+    BNO055IMU gyro;
+    Orientation angles;
+    Acceleration gravity;
     NormalizedColorSensor colorSensor;
     NormalizedColorSensor gemSensor;
 
@@ -68,12 +77,15 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
 
         colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
         gemSensor = hardwareMap.get(NormalizedColorSensor.class, "gemSensor");
-        gyro = hardwareMap.get(ModernRoboticsI2cGyro.class, "gyro");
-        telemetry.log().add("Gyro Calibrating. Do Not Move!");
-        gyro.calibrate();
-        while (!isStopRequested() && gyro.isCalibrating()) {
-            sleep(50);
-        }
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled      = true;
+        parameters.loggingTag          = "GRYO";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        gyro = hardwareMap.get(BNO055IMU.class, "gyro");
+        gyro.initialize(parameters);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -158,9 +170,11 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
     public double getlcorrection(double targetAngle, double threshold, double intensity) {
         double lcorrection = 1;
         if (targetAngle - getAngle() > threshold) {
-            lcorrection = 1 - Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
+            lcorrection = -Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
+            // OLD 1-AXIS FORMULA lcorrection = 1 - Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
         } else if (targetAngle - getAngle() < -threshold) {
-            lcorrection = 1 + Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
+            lcorrection = Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
+            // OLD 1-AXIS FORMULA lcorrection = 1 + Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
         }
         return lcorrection;
     }
@@ -168,9 +182,11 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
     public double getrcorrection(double targetAngle, double threshold, double intensity) {
         double rcorrection = 1;
         if (targetAngle - getAngle() > threshold) {
-            rcorrection = 1 + Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
+            rcorrection = Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
+            // OLD 1-AXIS FORMULA rcorrection = 1 + Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
         } else if (targetAngle - getAngle() < -threshold) {
-            rcorrection = 1 - Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
+            rcorrection = -Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
+            // OLD 1-AXIS FORMULA rcorrection = 1 - Math.atan(Math.abs(targetAngle - getAngle()) - threshold) * intensity / 6.28;
         }
         return rcorrection;
     }
@@ -195,10 +211,10 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
     public void move_advanced(double ypower, double xpower, double targetAngle, double threshold, double intensity, double distance) {
         double start = getEncoderAvg();
         while (Math.abs(getEncoderAvg() - start) < distance) {
-            frdrive.setPower((ypower + xpower) * getrcorrection(targetAngle, threshold, intensity));
-            brdrive.setPower((ypower - xpower) * getrcorrection(targetAngle, threshold, intensity));
-            fldrive.setPower(-(ypower - xpower) * getlcorrection(targetAngle, threshold, intensity));
-            bldrive.setPower(-(ypower + xpower) * getlcorrection(targetAngle, threshold, intensity));
+            frdrive.setPower((ypower + xpower) + getrcorrection(targetAngle, threshold, intensity));
+            brdrive.setPower((ypower - xpower) + getrcorrection(targetAngle, threshold, intensity));
+            fldrive.setPower(-(ypower - xpower) + getlcorrection(targetAngle, threshold, intensity));
+            bldrive.setPower(-(ypower + xpower) + getlcorrection(targetAngle, threshold, intensity));
         }
         stop_motors();
     }
@@ -229,7 +245,7 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
 
     //======================= PID + GRYO =========================
 
-    public void move_advancedplus(double ypower, double xpower, double kporp, double kintg, double kderv, double distance, double thresholdPID, double thresholdGyro, double intensityGryo) {
+    public void move_advancedplus(double ypower, double xpower, double kporp, double kintg, double kderv, double distance, double angle, double thresholdPID, double thresholdGyro, double intensityGryo) {
         double error = distance;
         double totalError = 0;
         double prevTime = System.currentTimeMillis();
@@ -243,10 +259,10 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
             double intg = kintg * totalError;
             double derv = kderv * (error / deltaTime);
             double PIDmod = prop + intg + derv;
-            frdrive.setPower((ypower + xpower) * PIDmod * getrcorrection(getAngle(), thresholdGyro, intensityGryo));
-            brdrive.setPower((ypower - xpower) * PIDmod * getrcorrection(getAngle(), thresholdGyro, intensityGryo));
-            fldrive.setPower(-(ypower - xpower) * PIDmod * getlcorrection(getAngle(), thresholdGyro, intensityGryo));
-            bldrive.setPower(-(ypower + xpower) * PIDmod * getlcorrection(getAngle(), thresholdGyro, intensityGryo));
+            frdrive.setPower((ypower + xpower) * PIDmod + getrcorrection(angle, thresholdGyro, intensityGryo));
+            brdrive.setPower((ypower - xpower) * PIDmod + getrcorrection(angle, thresholdGyro, intensityGryo));
+            fldrive.setPower(-(ypower - xpower) * PIDmod + getlcorrection(angle, thresholdGyro, intensityGryo));
+            bldrive.setPower(-(ypower + xpower) * PIDmod + getlcorrection(angle, thresholdGyro, intensityGryo));
         }
         stop_motors();
     }
@@ -257,18 +273,18 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         double start = getEncoderAvg();
         if (isRed) {
             while (getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff) {
-                frdrive.setPower((ypower + xpower) * getrcorrection(targetAngle, threshold, intensity));
-                brdrive.setPower((ypower - xpower) * getrcorrection(targetAngle, threshold, intensity));
-                fldrive.setPower(-(ypower - xpower) * getlcorrection(targetAngle, threshold, intensity));
-                bldrive.setPower(-(ypower + xpower) * getlcorrection(targetAngle, threshold, intensity));
+                frdrive.setPower((ypower + xpower) + getrcorrection(targetAngle, threshold, intensity));
+                brdrive.setPower((ypower - xpower) + getrcorrection(targetAngle, threshold, intensity));
+                fldrive.setPower(-(ypower - xpower) + getlcorrection(targetAngle, threshold, intensity));
+                bldrive.setPower(-(ypower + xpower) + getlcorrection(targetAngle, threshold, intensity));
             }
             stop_motors();
         } else {
             while (getFloorBlue() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff) {
-                frdrive.setPower((ypower + xpower) * getrcorrection(targetAngle, threshold, intensity));
-                brdrive.setPower((ypower - xpower) * getrcorrection(targetAngle, threshold, intensity));
-                fldrive.setPower(-(ypower - xpower) * getlcorrection(targetAngle, threshold, intensity));
-                bldrive.setPower(-(ypower + xpower) * getlcorrection(targetAngle, threshold, intensity));
+                frdrive.setPower((ypower + xpower) + getrcorrection(targetAngle, threshold, intensity));
+                brdrive.setPower((ypower - xpower) + getrcorrection(targetAngle, threshold, intensity));
+                fldrive.setPower(-(ypower - xpower) + getlcorrection(targetAngle, threshold, intensity));
+                bldrive.setPower(-(ypower + xpower) + getlcorrection(targetAngle, threshold, intensity));
             }
 
         }
@@ -325,9 +341,12 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
 
     //====================== SENSORS ======================
 
-    public double getAngle() {
-        return gyro.rawZ();
+    public double getAngle()
+    {
+        angles   = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return angles.firstAngle;
     }
+
 
     public double getRed() {
         NormalizedRGBA colors = gemSensor.getNormalizedColors();
