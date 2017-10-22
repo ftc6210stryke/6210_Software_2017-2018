@@ -51,6 +51,10 @@ public class AutoBlueInner_v1 extends AutoLibrary_v1{
         {
             move_advanced(0, .25, angle, 3, 1, 200);
         }
+        else
+        {
+            move_advanced(0, .25, angle, 3, 1, 300);
+        }
         turn_gyro(.3, angle, 3);
         move_advanced(.25, 0, angle, 3, 1, 100);
         startIntake(1);

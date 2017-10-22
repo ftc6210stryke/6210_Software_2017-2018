@@ -18,12 +18,14 @@ public class TeleOp_v2 extends TeleOpLibrary_v1
 {
     private double drivePowerMod;
     private boolean tank;
+    private boolean correction_actve;
 
     @Override
     public void init() {
         initialize();
         drivePowerMod = .8;
         tank = false;
+        correction_actve = true;
         angle = getAngle();
     }
 
@@ -50,14 +52,14 @@ public class TeleOp_v2 extends TeleOpLibrary_v1
         // Mecanum Drive
         if (!tank)
         {
-           drive_mecanum(drivePowerMod);
+           drive_mecanum(drivePowerMod, correction_actve);
         }
         //tank drive
         else
         {
             drive_tank(drivePowerMod);
         }
-        toggleDouble(angle, gamepad1.y, getAngle(), getAngle());
+        correction_actve = toggle(correction_actve, gamepad1.y);
         tank = toggle(tank, gamepad1.b);
         drivePowerMod = toggleDouble(drivePowerMod, gamepad1.x, .8, .2);
 
