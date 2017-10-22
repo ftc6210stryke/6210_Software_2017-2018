@@ -1,5 +1,5 @@
 /*
-AutoMain_v1
+AutoRedInnerMain_v1
 9/18/2017
 6210 Software
 - William Fisher
@@ -21,43 +21,56 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-@Autonomous (name="AutoBlueInner_v1", group="Auto")
-public class AutoBlueInner_v1 extends AutoLibrary_v1{
+@Autonomous (name="AutoRedInner_v1", group="Auto")
+public class AutoRedInner_v1 extends AutoLibrary_v1{
 
-    private ElapsedTime runtime = new ElapsedTime();
     private RelicRecoveryVuMark targetColumn;
 
     @Override
     public void runOpMode() {
+/*  move for positioning for jewel
+    turn for positioning for jewel
+    get jewel
+    move for pictograph viewing
+    get pictograph formation
+    move/gyro positioning for output
+    output unfold
+    output
+    move to park on balancing stone
 
+    ask will about deleting elevator and creating conveyor code
+    ask will about strategy in his blue inner and if that was based on previous manip or current
+
+    -Rohit
+ */
         initialize();
         waitForStart();
-        runtime.reset();
         double angle = getAngle();
-        move_advanced(.25, 0, angle, 3, 1, 200);
-        turn_gyro(.3, angle, 3);
-        getGem(1, 3);
-        move_advanced(0, .25, angle, 3, 1, 200);
-        targetColumn = getSymbol_multitry(3, angle);
-        move_advanced(0, .25, angle, 3, 1, 400);
+        move_advanced();
+        turn_gyro();
+        getGem();
+        move_advanced();
+        targetColumn = getSymbol_multitry();
+        move_advanced();
         angle = angle - 90;
-        turn_gyro(.7, angle, 3);
-        move2Line(0, .25, 1000, angle, 3, 1, 3, false);
+        turn_gyro();
+        move2Line();
         if (targetColumn == RelicRecoveryVuMark.CENTER)
         {
-            move_advanced(0, .25, angle, 3, 1, 100);
+            move_advanced();
         }
         else if (targetColumn == RelicRecoveryVuMark.LEFT)
         {
-            move_advanced(0, .25, angle, 3, 1, 200);
+            move_advanced();
         }
-        turn_gyro(.3, angle, 3);
-        move_advanced(.25, 0, angle, 3, 1, 100);
-        startIntake(1);
-        sleep(500);
+        turn_gyro();
+        move_advances();
+        startIntake();
+        sleep();
         stopIntake();
-        output_start(1);
-        sleep(500);
-        output_stop();
+        outputStart();
+        sleep();
+        outputStop();
+
     }
 }
