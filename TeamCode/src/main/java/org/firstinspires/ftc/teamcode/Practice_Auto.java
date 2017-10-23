@@ -109,7 +109,33 @@ public abstract class Practice_Auto extends LinearOpMode {
         stop_motors();
     }
 
-    public double getAngle() {
+    public void move_gyro_correct(double power, double targetAngle, double threshold)
+    {
+        frdrive.setPower(power * getRcorrect());
+        brdrive.setPower(power * getRcorrect());
+        fldrive.setPower(-power * getLcorrect());
+        bldrive.setPower(-power * getLcorrect());
+    }
+
+    public double getRcorrect(double targetAngle, double threshold) {
+        if (targetAngle - getAngle() > threshold) {
+            return 1 + (Math.abs(targetAngle - getAngle())) / 90;
+        } else if (targetAngle - getAngle() < threshold) {
+            return 1 - (Math.abs(targetAngle - getAngle())) / 90;
+        }
+        return 1;
+    }
+
+    public double getLcorrect(double targetAngle, double threshold) {
+        if (targetAngle - getAngle() < threshold) {
+            return 1 + (Math.abs(targetAngle - getAngle())) / 90;
+        } else if (targetAngle - getAngle() > threshold) {
+            return 1 - (Math.abs(targetAngle - getAngle())) / 90;
+        }
+        return 1;
+    }
+
+    public double getAngle(){
         angles = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return angles.firstAngle;
     }
