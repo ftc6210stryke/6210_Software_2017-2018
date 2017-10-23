@@ -59,6 +59,8 @@ public class TeleOp_v2 extends TeleOpLibrary_v1
         {
             drive_tank(drivePowerMod);
         }
+        //intake(gamepad1.a);
+        //moveTopTrack(gamepad2.right_trigger, gamepad2.left_trigger);
         correction_actve = toggle(correction_actve, gamepad1.y);
         tank = toggle(tank, gamepad1.b);
         drivePowerMod = toggleDouble(drivePowerMod, gamepad1.x, .8, .2);

@@ -28,12 +28,11 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
     public DcMotor brdrive;
     public DcMotor fldrive;
     public DcMotor frdrive;
-/**    public DcMotor intake1;
-    public DcMotor intake2;
-    public DcMotor elevatorV1; //vexmotor
-    public DcMotor elevatorV2; //vexmotor
-    public DcMotor elevatorH1; //vexmotor
-    public DcMotor elevatorH2; //vexmotor **/
+ /*   public DcMotor topTrack;
+    public DcMotor botrIntake; //vex
+    public DcMotor botlIntake; //vex
+    public DcMotor toprIntake; //vex
+    public DcMotor toplIntake; // vex*/
     public double ypower;
     public double xpower;
     public double rturnpower;
@@ -341,40 +340,32 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
     {
         if (control)
         {
-            intake1.setPower(1);
-            intake2.setPower(-1);
+            botlIntake.setPower(-1);
+            botrIntake.setPower(1);
+            toplIntake.setPower(-1);
+            toprIntake.setPower(1);
+
         } else {
-            intake1.setPower(0);
-            intake2.setPower(0);
+            botlIntake.setPower(0);
+            botrIntake.setPower(0);
+            toplIntake.setPower(0);
+            toprIntake.setPower(0);
         }
     }
 
-    public void elevator(boolean controlUp, boolean controlDown, boolean controlOut)
+    public void moveTopTrack(double controlUp, double controlDown)
     {
-        if (controlUp)
+        if (controlUp > .1)
         {
-            elevatorV1.setPower(1);
-            elevatorV2.setPower(-1);
+            topTrack.setPower(controlUp / 2);
         }
-        else if (controlDown)
+        else if (controlDown > .1)
         {
-            elevatorV1.setPower(-1);
-            elevatorV2.setPower(1);
+            topTrack.setPower(-controlDown / 2);
         }
         else
         {
-            elevatorV1.setPower(0);
-            elevatorV2.setPower(0);
-        }
-        if (controlOut)
-        {
-            elevatorH1.setPower(1);
-            elevatorH2.setPower(-1);
-        }
-        else
-        {
-            elevatorH1.setPower(0);
-            elevatorH2.setPower(0);
+            topTrack.setPower(0);
         }
     }
 
