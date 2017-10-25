@@ -52,10 +52,10 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
     public DcMotor fldrive;
     public DcMotor frdrive;
     public DcMotor topTrack;
-    public DcMotor botrIntake; //vexmotor
-    public DcMotor botlIntake; //vexmotor
-    public DcMotor toprIntake; //vexmotor
-    public DcMotor toplIntake; //vexmotor
+    public DcMotor rIntake; //vexmotor
+    public DcMotor lIntake; //vexmotor
+    public DcMotor rOutput; //vexmotor
+    public DcMotor lOutput; //vexmotor
 
     public Servo gemArm;
     public Servo gemFlick;
@@ -143,7 +143,7 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
     //====================== ENCODER ONLY MOVEMENT METHODS ======================
 
     public double getEncoderAvg() {
-        return ((frdrive.getCurrentPosition() + fldrive.getCurrentPosition()) / 2);
+        return ((frdrive.getCurrentPosition() + fldrive.getCurrentPosition() + brdrive.getCurrentPosition() + bldrive.getCurrentPosition()) / 4);
     }
 
     public void move_encoder(double ypower, double xpower, double distance) {
@@ -190,10 +190,18 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         return rcorrection;
     }
 
-    public void turn_gyro(double power, double targetAngle, double threshold) {
-        while (Math.abs(targetAngle - getAngle()) > threshold)
+    public void turn_gyro(double power, double targetAngle, double threshold)
+    {
+        while (Math.abs(angle_delta(getAngle(), targetAngle)) > threshold)
         {
-            turn_basic(power);
+            if (angle_delta(getAngle(), targetAngle) > 0)
+            {
+                turn_basic(power);
+            }
+            else
+            {
+                turn_basic(-power);
+            }
         }
     }
 
@@ -266,6 +274,34 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
         stop_motors();
     }
 
+    public void turn_PID(double power, double kporp, double kintg, double kderv, double targetAngle, double threshold)
+    {
+        double error = Math.abs(angle_delta(getAngle(), targetAngle));
+        double totalError = 0;
+        double prevTime = System.currentTimeMillis();
+        while (Math.abs(error) > threshold)
+        {
+            double currTime = System.currentTimeMillis();
+            double deltaTime = currTime - prevTime;
+            prevTime = currTime;
+            error = Math.abs(angle_delta(getAngle(), targetAngle));
+            totalError = error * deltaTime;
+            double prop = kporp * error;
+            double intg = kintg * totalError;
+            double derv = kderv * (error / deltaTime);
+            double PIDmod = prop + intg + derv;
+            if (angle_delta(getAngle(), targetAngle) > 0)
+            {
+                turn_basic(power * PIDmod);
+            }
+            else
+            {
+                turn_basic(-power * PIDmod);
+            }
+        }
+        stop_motors();
+    }
+
     //====================== SPECIALIZED MOVEMENT / PATH-ING ========================
 
     public void move2Line(double ypower, double xpower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed) {
@@ -293,15 +329,21 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
     //====================== MANIPULATORS ===================================
 
     public void startIntake(double power) {
-        botlIntake.setPower(-power);
-        botrIntake.setPower(power);
-        toplIntake.setPower(-power);
-        toprIntake.setPower(power);
+        lIntake.setPower(-power);
+        rIntake.setPower(power);
     }
 
     public void stopIntake() {
         startIntake(0);
     }
+
+    public void startOutput(double power)
+    {
+        lOutput.setPower(-power);
+        rOutput.setPower(power);
+    }
+
+    public void stopOutput() { startOutput(0); }
 
     public void moveTopTrack(double power, double distance) {
         double start = topTrack.getCurrentPosition();
