@@ -51,12 +51,11 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
     public DcMotor brdrive;
     public DcMotor fldrive;
     public DcMotor frdrive;
-    public DcMotor intake1;
-    public DcMotor intake2;
-    public DcMotor elevatorV1; //vexmotor
-    public DcMotor elevatorV2; //vexmotor
-    public DcMotor elevatorH1; //vexmotor
-    public DcMotor elevatorH2; //vexmotor
+    public DcMotor topTrack;
+    public DcMotor botrIntake; //vexmotor
+    public DcMotor botlIntake; //vexmotor
+    public DcMotor toprIntake; //vexmotor
+    public DcMotor toplIntake; //vexmotor
 
     public Servo gemArm;
     public Servo gemFlick;
@@ -294,31 +293,22 @@ public abstract class AutoLibrary_v1 extends LinearOpMode {
     //====================== MANIPULATORS ===================================
 
     public void startIntake(double power) {
-        intake1.setPower(power);
-        intake2.setPower(-power);
+        botlIntake.setPower(-power);
+        botrIntake.setPower(power);
+        toplIntake.setPower(-power);
+        toprIntake.setPower(power);
     }
 
     public void stopIntake() {
         startIntake(0);
     }
 
-    public void elevatorUp(double power, double distance) {
-        double start = elevatorV1.getCurrentPosition();
-        while (Math.abs(elevatorV1.getCurrentPosition() - start) < distance) {
-            elevatorV1.setPower(power);
-            elevatorV2.setPower(-power);
+    public void moveTopTrack(double power, double distance) {
+        double start = topTrack.getCurrentPosition();
+        while (Math.abs(topTrack.getCurrentPosition() - start) < distance) {
+            topTrack.setPower(power);
         }
-        elevatorV1.setPower(0);
-        elevatorV2.setPower(0);
-    }
-
-    public void output_start(double power) {
-        elevatorH1.setPower(power);
-        elevatorH2.setPower(power);
-    }
-
-    public void output_stop() {
-        output_start(0);
+        topTrack.setPower(0);
     }
 
     public void getGem(double extension, double threshold) {
