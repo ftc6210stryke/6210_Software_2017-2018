@@ -27,6 +27,7 @@ public class PracticeAuto_Nihal extends linearOpMode{
     public DcMotor brdrive;
     public DcMotor fldrive;
     public DcMotor frdrive;
+    public double angle;
 
     public void initialize() {
         frdrive = hardwareMap.get(DcMotor.class, "a");
@@ -118,5 +119,31 @@ public class PracticeAuto_Nihal extends linearOpMode{
         }
         move_basic(0);
     }
+
+    public void move_corrections(double power, double threshold, double intensity)
+    {
+        frdrive.setPower(power * correction_R(threshold, intensity));
+        brdrive.setPower(power * correction_R(threshold, intensity));
+        fldrive.setPower(power * correction_L(threshold, intensity));
+        bldrive.setPower(power * correction_L(threshold, intensity));
+    }
+
+    public double correction_R (double threshold, double intensity)
+    {
+        if (math.abs(angle - getAngle()) > threshold)
+        {
+            return math.abs(angle - getAngle() )/90 + 1;
+        }
+        else if (math.abs(angle - getAngle()) < threshold)
+        {
+            return 1 - math.abs(angle - getAngle() )/90;
+        }
+    }
+
+    public double correction_L (double threshold, double intensity)
+    {
+
+    }
+
 }
 
