@@ -131,12 +131,12 @@ public abstract class Practice_Auto extends LinearOpMode {
             return 1 + (Math.abs(targetAngle - getAngle())) / 90;
         } else if (targetAngle - getAngle() > threshold) {
             return 1 - (Math.abs(targetAngle - getAngle())) / 90;
-        }
-        return 1;
-    }
 
     public double getAngle(){
         angles = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+    }
+        return 1;
+}
         return angles.firstAngle;
     }
 }

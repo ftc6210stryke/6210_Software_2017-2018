@@ -39,6 +39,7 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
     public double lturnpower;
     public double toggleguard;
     public double angle;
+    public int outputLevel;
     BNO055IMU gyro;
     Orientation angles;
     Acceleration gravity;
@@ -353,27 +354,66 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         }
     }
 
-    public void moveTopTrack(double controlUp, double controlDown)
-    {
-        if (controlUp > .1)
-        {
-            topTrack.setPower(controlUp / 2);
-        }
-        else if (controlDown > .1)
-        {
-            topTrack.setPower(-controlDown / 2);
-        }
-        else
-        {
-            topTrack.setPower(0);
-        }
-    }
-
     public void relic()
     {
         //empty
-    }*/
+    }
 
+    public void moveTopTrack(double power, boolean control0, boolean control1, boolean control2, boolean control3)
+    {
+        double start = topTrack.getCurrentPosition();
+        if (control0 && outputLevel != 0)
+        {
+                while (Math.abs(topTrack.getCurrentPosition - start) > (100*outputLevel))
+                {
+                    topTrack.setPower(-power);
+                }
+                outputLevel = 0;
+        }
+        else if (control1 && outputLevel != 1)
+        {
+            if (topTrack.getCurrentPosition < start)
+            {
+                while (Math.abs(topTrack.getCurrentPosition - start) > (100*(1 - outputLevel))
+                {
+                    topTrack.setPower(power);
+                }
+            }
+            else
+            {
+                while (Math.abs(topTrack.getCurrentPosition -start) > 100*(outputLevel-1));
+                topTrack.setPower(-power);
+            }
+            outputLevel = 1;
+        }
+        else if (control2 && outputLevel != 2)
+        {
+            if (topTrack.getCurrentPosition < start)
+            {
+                while (Math.abs(topTrack.getCurrentPosition - start) > 100*(2 - outputLevel))
+                {
+                    topTrack.setPower(power);
+                }
+            }
+            else
+            {
+                while (Math.abs(topTrack.getCurrentPosition -start) > 100*(outputLevel-2));
+                topTrack.setPower(-power);
+            }
+            outputLevel = 2;
+        }
+        else if (control3 && outputLevel != 3)
+        {
+            while (Math.abs(topTrack.getCurrentPosition - start) > 100*(3 - outputLevel))
+            {
+                topTrack.setPower(power);
+            }
+            outputLevel = 3;
+        }
+
+    }
+
+*/
 
 // ===================================== UTILITY METHODS ==================================
 

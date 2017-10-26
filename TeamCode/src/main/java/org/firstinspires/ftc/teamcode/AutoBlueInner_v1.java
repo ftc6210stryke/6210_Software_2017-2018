@@ -60,8 +60,8 @@ public class AutoBlueInner_v1 extends AutoLibrary_v1{
         startIntake(1);
         sleep(500);
         stopIntake();
-        output_start(1);
+        startOutput(1);
         sleep(500);
-        output_stop();
+        stopOutput();
     }
 }
