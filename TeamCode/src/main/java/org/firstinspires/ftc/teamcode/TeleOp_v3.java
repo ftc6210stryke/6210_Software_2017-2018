@@ -11,24 +11,19 @@ the driver controlled period of FTC's Relic Recovery competition.
  */
 
 package org.firstinspires.ftc.teamcode;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@Disabled
-@TeleOp(name="TeleOp v2.2", group="TeleOp")
-public class TeleOp_v2 extends TeleOpLibrary_v1
+@TeleOp(name="TeleOp v3.0", group="TeleOp")
+public class TeleOp_v3 extends TeleOpLibrary_v2
 {
     private double drivePowerMod;
     private boolean tank;
-    private boolean correction_actve;
 
     @Override
     public void init() {
-        initialize();
         drivePowerMod = .8;
         tank = false;
-        correction_actve = true;
-        angle = getAngle();
+        initialize();
     }
 
     /*
@@ -54,7 +49,7 @@ public class TeleOp_v2 extends TeleOpLibrary_v1
         // Mecanum Drive
         if (!tank)
         {
-           drive_mecanum(drivePowerMod, correction_actve);
+           drive_mecanum(drivePowerMod);
         }
         //tank drive
         else
@@ -62,8 +57,7 @@ public class TeleOp_v2 extends TeleOpLibrary_v1
             drive_tank(drivePowerMod);
         }
         //intake(gamepad1.a);
-        //moveTopTrack(gamepad2.right_trigger, gamepad2.left_trigger);
-        correction_actve = toggle(correction_actve, gamepad1.y);
+        moveTopTrack(.5, gamepad2.a, gamepad2.b, gamepad2.x, gamepad2.y);
         tank = toggle(tank, gamepad1.b);
         drivePowerMod = toggleDouble(drivePowerMod, gamepad1.x, .8, .2);
 
