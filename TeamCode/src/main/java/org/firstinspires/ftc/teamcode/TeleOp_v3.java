@@ -55,7 +55,7 @@ public class TeleOp_v3 extends TeleOpLibrary_v2
         else
         {
             drive_tank(drivePowerMod);
-        }1
+        }
         //intake(gamepad1.a);
         angle_adjust(gamepad2.left_stick_y);
         intake(gamepad2.right_bumper, gamepad2.left_bumper);
