@@ -208,6 +208,8 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
             lIntake.setPower(-1);
             rIntake.setPower(1);
             belt.setPower(.9);
+            telemetry.addLine("intake command recieved");
+            telemetry.update();
 
         } else if (control_reverse){
             lIntake.setPower(1);
@@ -226,7 +228,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     {
         if (control)
         {
-            rOutput.setPower(.9);
+            rOutput.setPower(-.9);
             lOutput.setPower(-.9);
         }
         else
@@ -349,5 +351,28 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         return target;
     }
 
+// ================================= ANGLE ADJUST ==========================================
+
+    public void angle_adjust (double control)
+    {
+        if (control > .2)
+        {
+            control = control*2;
+            if (control > 1)
+            {
+                control = 1;
+            }
+            topTrack.setPower(control);
+        }
+        else if (control < -.2)
+        {
+            control = control/2;
+            topTrack.setPower(control);
+        }
+        else
+        {
+            topTrack.setPower(0);
+        }
+    }
 }
 
