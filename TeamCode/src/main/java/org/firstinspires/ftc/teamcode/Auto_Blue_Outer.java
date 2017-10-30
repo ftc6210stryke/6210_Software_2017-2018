@@ -31,6 +31,5 @@ public class Auto_Blue_Outer extends AutoLibrary_v1{
         move_advanced(.25, 0, angle, 3, 1, 200);
         getGem(1, 3);
         move_advanced(0, .25, angle, 3, 1, 200);
-        move_advanced();
     }
 }

@@ -20,6 +20,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+@Disabled
 @TeleOp(name="TeleOp v1.3", group="TeleOp")
 public class TeleOp_v1 extends OpMode
 {
