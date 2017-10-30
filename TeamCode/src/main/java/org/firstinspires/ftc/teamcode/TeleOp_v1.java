@@ -15,6 +15,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
@@ -23,6 +24,10 @@ import com.qualcomm.robotcore.util.Range;
 public class TeleOp_v1 extends OpMode
 {
     private ElapsedTime runtime = new ElapsedTime();
+    private CRServo leftVex;
+    private CRServo rightVex;
+    private CRServo beltVex;
+
     private DcMotor bldrive;
     private DcMotor brdrive;
     private DcMotor fldrive;
@@ -44,6 +49,10 @@ public class TeleOp_v1 extends OpMode
         bldrive = hardwareMap.get(DcMotor.class, "d");
         frdrive  = hardwareMap.get(DcMotor.class, "a");
         fldrive = hardwareMap.get(DcMotor.class, "b");
+        beltVex = hardwareMap.get(CRServo.class, "v");
+        leftVex = hardwareMap.get(CRServo.class, "l");
+        rightVex = hardwareMap.get(CRServo.class, "r");
+
         drivePowerMod = 1;
         xpower = 0;
         ypower = 0;
@@ -54,6 +63,8 @@ public class TeleOp_v1 extends OpMode
 
         telemetry.addData("Status", "Initialized");
     }
+
+
 
     /*
      * Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
