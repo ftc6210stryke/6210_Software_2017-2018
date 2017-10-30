@@ -13,6 +13,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
@@ -28,10 +29,11 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public DcMotor fldrive;
     public DcMotor frdrive;
     public DcMotor topTrack;
-    public DcMotor botrIntake; //vex
-    public DcMotor botlIntake; //vex
-    public DcMotor toprIntake; //vex
-    public DcMotor toplIntake; // vex*/
+    public DcMotor rOutput;
+    public DcMotor lOutput;
+    public CRServo belt;
+    public CRServo rIntake;
+    public CRServo lIntake;
     public double ypower;
     public double xpower;
     public double rturnpower;
@@ -46,10 +48,12 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         brdrive  = hardwareMap.get(DcMotor.class, "br");
         bldrive = hardwareMap.get(DcMotor.class, "bl");
         topTrack = hardwareMap.get(DcMotor.class, "topt");
-        /**
-         * intake1 = hardwareMap.get(DcMotor.class, "i1");
-         * intake2 = hardwareMap.get(DcMotor.class, "i2");
-         */
+        rOutput = hardwareMap.get(DcMotor.class, "rOut");
+        lOutput = hardwareMap.get(DcMotor.class, "lOut");
+        belt = hardwareMap.get(CRServo.class, "belt");
+        rIntake = hardwareMap.get(CRServo.class, "rIn");
+        lIntake = hardwareMap.get(CRServo.class, "lIn");
+
         xpower = 0;
         ypower = 0;
         lturnpower = 0;
@@ -197,24 +201,43 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
 //====================================== MANIPULATORS METHODS =================================
 
-/*    public void intake(boolean control)
+    public void intake(boolean control, boolean control_reverse)
     {
         if (control)
         {
-            botlIntake.setPower(-1);
-            botrIntake.setPower(1);
-            toplIntake.setPower(-1);
-            toprIntake.setPower(1);
+            lIntake.setPower(-1);
+            rIntake.setPower(1);
+            belt.setPower(.9);
 
-        } else {
-            botlIntake.setPower(0);
-            botrIntake.setPower(0);
-            toplIntake.setPower(0);
-            toprIntake.setPower(0);
+        } else if (control_reverse){
+            lIntake.setPower(1);
+            rIntake.setPower(-1);
+            belt.setPower(0);
+        }
+        else
+        {
+            lIntake.setPower(0);
+            rIntake.setPower(0);
+            belt.setPower(0);
         }
     }
 
-    public void relic()
+    public void output(boolean control)
+    {
+        if (control)
+        {
+            rOutput.setPower(.9);
+            lOutput.setPower(-.9);
+        }
+        else
+        {
+            rOutput.setPower(0);
+            lOutput.setPower(0);
+        }
+    }
+
+
+/*    public void relic()
     {
         //empty
     }*/
