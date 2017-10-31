@@ -41,11 +41,10 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public double toggleguard;
     public int outputLevel;
 
-    public void initialize()
-    {
-        frdrive  = hardwareMap.get(DcMotor.class, "fr");
+    public void initialize() {
+        frdrive = hardwareMap.get(DcMotor.class, "fr");
         fldrive = hardwareMap.get(DcMotor.class, "fl");
-        brdrive  = hardwareMap.get(DcMotor.class, "br");
+        brdrive = hardwareMap.get(DcMotor.class, "br");
         bldrive = hardwareMap.get(DcMotor.class, "bl");
         topTrack = hardwareMap.get(DcMotor.class, "topt");
         rOutput = hardwareMap.get(DcMotor.class, "rOut");
@@ -74,49 +73,41 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         lturnpower = gamepad1.left_trigger;
 
         //If rturnpower if greater than .1, turn right
-        if (rturnpower > .1)
-        {
+        if (rturnpower > .1) {
             turn(true, drivePowerMod);
         }
         //If lturnpower if greater than .1, turn left
-        else if (lturnpower > .1)
-        {
+        else if (lturnpower > .1) {
             turn(false, drivePowerMod);
         }
         //if either joystick is over .1, engage mecanum drive
-        else if (Math.abs(gamepad1.right_stick_x) > .1 || Math.abs(gamepad1.right_stick_y) > .1)
-        {
+        else if (Math.abs(gamepad1.right_stick_x) > .1 || Math.abs(gamepad1.right_stick_y) > .1) {
             //subtpower && pluspower in formulas specific to controlling the wheels in mecanum drive
             double subtpower = ypower - xpower;
             double pluspower = ypower + xpower;
             //as long as subtpower is over .1 (so as not to take sqaureroot of zero) power subt motors
-            if (Math.abs(subtpower) > .1)
-            {
+            if (Math.abs(subtpower) > .1) {
                 fldrive.setPower(-getMecanumPower2(subtpower, drivePowerMod));
                 brdrive.setPower(getMecanumPower2(subtpower, drivePowerMod));
             }
             //otherwise, subtpower motors are turned off
-            else
-            {
+            else {
                 frdrive.setPower(0);
                 bldrive.setPower(0);
             }
             //as long as pluspower is over .1 (so as not to take sqaureroot of zero) power plus motors
-            if (Math.abs(pluspower) > .1)
-            {
+            if (Math.abs(pluspower) > .1) {
                 frdrive.setPower(getMecanumPower2(pluspower, drivePowerMod));
                 bldrive.setPower(-getMecanumPower2(pluspower, drivePowerMod));
             }
             //otherwise, pluspower motors are turned off
-            else
-            {
+            else {
                 fldrive.setPower(0);
                 brdrive.setPower(0);
             }
         }
         //if not input from triggers or stick, turn motors off
-        else
-        {
+        else {
             frdrive.setPower(0);
             fldrive.setPower(0);
             bldrive.setPower(0);
@@ -126,28 +117,22 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
     //Determine initial power from squaring the gamestick multipled by +/-
     //MUST BE FINISHED BY getMecanumPower2
-    public double getMecanumPower1(boolean isY)
-    {
+    public double getMecanumPower1(boolean isY) {
         double output = 0;
-        if (isY)
-        {
-            if (Math.abs(gamepad1.right_stick_y) > .1)
-            {
+        if (isY) {
+            if (Math.abs(gamepad1.right_stick_y) > .1) {
                 output = -Math.pow(gamepad1.right_stick_y, 2) * gamepad1.right_stick_y / Math.abs(gamepad1.right_stick_y);
                 //if output is greater than .45, reduce to .45 to prevent going over 1
-                if (Math.abs(output) > .45)
-                {
+                if (Math.abs(output) > .45) {
                     output = (output / Math.abs(output)) * .45;
                 }
 
             }
         } else {
-            if (Math.abs(gamepad1.right_stick_x) > .1)
-            {
+            if (Math.abs(gamepad1.right_stick_x) > .1) {
                 output = Math.pow(gamepad1.right_stick_x, 2) * gamepad1.right_stick_x / Math.abs(gamepad1.right_stick_x);
                 //if xpower is greater than .45, reduce to .45 to prevent going over 1
-                if (Math.abs(output) > .45)
-                {
+                if (Math.abs(output) > .45) {
                     output = (output / Math.abs(output)) * .45;
                 }
             }
@@ -157,21 +142,17 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
     //find squareroot of xpower +- ypower while keeping sign
     //MUST FOLLOW getMecanumPower1
-    public double getMecanumPower2(double xplusy, double drivePowerMod)
-    {
+    public double getMecanumPower2(double xplusy, double drivePowerMod) {
         return Math.pow(Math.abs(xplusy), .5) * (xplusy) / Math.abs(xplusy) * drivePowerMod;
     }
 
-    public void turn (boolean isRight, double drivePowerMod)
-    {
-        if(isRight)
-        {
+    public void turn(boolean isRight, double drivePowerMod) {
+        if (isRight) {
             frdrive.setPower(-rturnpower * drivePowerMod);
             fldrive.setPower(-rturnpower * drivePowerMod);
             brdrive.setPower(-rturnpower * drivePowerMod);
             bldrive.setPower(-rturnpower * drivePowerMod);
-        } else
-        {
+        } else {
             frdrive.setPower(lturnpower * drivePowerMod);
             fldrive.setPower(lturnpower * drivePowerMod);
             brdrive.setPower(lturnpower * drivePowerMod);
@@ -179,8 +160,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         }
     }
 
-    public void drive_tank(double drivePowerMod)
-    {
+    public void drive_tank(double drivePowerMod) {
         if (Math.abs(gamepad1.left_stick_y) > .1) {
             bldrive.setPower(-gamepad1.left_stick_y);
             fldrive.setPower(-gamepad1.left_stick_y);
@@ -201,32 +181,32 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
 //====================================== MANIPULATORS METHODS =================================
 
-    public void intake(boolean control, boolean control_reverse)
-    {
-        if (control)
-        {
-            lIntake.setPower(-1);
-            rIntake.setPower(1);
-            belt.setPower(.9);
+    public void intake(boolean control, boolean control_reverse) {
+        if (control) {
+            lIntake.setPower(-.6);
+            rIntake.setPower(.6);
+            belt.setPower(.6);
             telemetry.addLine("intake command recieved");
             telemetry.update();
 
-        } else if (control_reverse){
-            lIntake.setPower(1);
-            rIntake.setPower(-1);
+        } else if (control_reverse) {
+            lIntake.setPower(.6);
+            rIntake.setPower(-.6);
             belt.setPower(0);
-        }
-        else
-        {
+        } else {
             lIntake.setPower(0);
             rIntake.setPower(0);
             belt.setPower(0);
         }
     }
 
-    public void output(boolean control)
-    {
+    public void output(boolean control, boolean control_reverse) {
         if (control)
+        {
+            rOutput.setPower(.9);
+            lOutput.setPower(.9);
+        }
+        else if (control_reverse)
         {
             rOutput.setPower(-.9);
             lOutput.setPower(-.9);
@@ -244,78 +224,50 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         //empty
     }*/
 
-    public void moveTopTrack(double power, boolean control0, boolean control1, boolean control2, boolean control3)
-    {
+    public void TopTrackSet(double power, boolean control0, boolean control1, boolean control2, boolean control3) {
         telemetry.addData("track encoder", topTrack.getCurrentPosition());
         telemetry.addData("track level", outputLevel);
         telemetry.update();
         double start = topTrack.getCurrentPosition();
-        if (control0 && outputLevel != 0)
-        {
-                while (Math.abs(topTrack.getCurrentPosition() - start) < (50*outputLevel))
-                {
-                    topTrack.setPower(-power/5);
-                }
-                outputLevel = 0;
-        }
-        else if (control1 && outputLevel != 1)
-        {
-            if (outputLevel == 0)
-            {
-                while (Math.abs(topTrack.getCurrentPosition() - start) < 150*(1 - outputLevel))
-                {
+        if (control0 && outputLevel != 0) {
+            while (Math.abs(topTrack.getCurrentPosition() - start) < (50 * outputLevel)) {
+                topTrack.setPower(-power / 5);
+            }
+            outputLevel = 0;
+        } else if (control1 && outputLevel != 1) {
+            if (outputLevel == 0) {
+                while (Math.abs(topTrack.getCurrentPosition() - start) < 150 * (1 - outputLevel)) {
                     topTrack.setPower(power);
                 }
-            }
-            else
-            {
-                while (Math.abs(topTrack.getCurrentPosition() -start) < 150*(outputLevel-1))
-                {
-                    topTrack.setPower(-power/5);
+            } else {
+                while (Math.abs(topTrack.getCurrentPosition() - start) < 150 * (outputLevel - 1)) {
+                    topTrack.setPower(-power / 5);
                 }
             }
             outputLevel = 1;
-        }
-        else if (control2 && outputLevel != 2)
-        {
-            if (outputLevel == 0 || outputLevel == 1)
-            {
-                while (Math.abs(topTrack.getCurrentPosition() - start) < 150*(2 - outputLevel))
-                {
+        } else if (control2 && outputLevel != 2) {
+            if (outputLevel == 0 || outputLevel == 1) {
+                while (Math.abs(topTrack.getCurrentPosition() - start) < 150 * (2 - outputLevel)) {
                     topTrack.setPower(power);
                 }
-            }
-            else
-            {
-                while (Math.abs(topTrack.getCurrentPosition() -start) < 150*(outputLevel-2))
-                {
-                    topTrack.setPower(-power/5);
+            } else {
+                while (Math.abs(topTrack.getCurrentPosition() - start) < 150 * (outputLevel - 2)) {
+                    topTrack.setPower(-power / 5);
                 }
             }
             outputLevel = 2;
-        }
-        else if (control3 && outputLevel != 3)
-        {
-            while (Math.abs(topTrack.getCurrentPosition() - start) < 150*(3 - outputLevel))
-            {
+        } else if (control3 && outputLevel != 3) {
+            while (Math.abs(topTrack.getCurrentPosition() - start) < 150 * (3 - outputLevel)) {
                 topTrack.setPower(power);
             }
             outputLevel = 3;
-        }
-        else if (gamepad2.dpad_up)
-        {
+        } else if (gamepad2.dpad_up) {
             topTrack.setPower(power);
-        }
-        else if (gamepad2.dpad_down)
-        {
-            topTrack.setPower(-power/5);
-        }
-        else if (gamepad2.dpad_left)
-        {
+        } else if (gamepad2.dpad_down) {
+            topTrack.setPower(-power / 5);
+        } else if (gamepad2.dpad_left) {
             topTrack.setPower(.25);
-        }
-        else
-        {
+        } else {
             topTrack.setPower(0);
         }
         telemetry.addData("track encoder", topTrack.getCurrentPosition());
@@ -323,37 +275,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         telemetry.update();
     }
 
-// ===================================== UTILITY METHODS ==================================
-
-    public boolean toggle(boolean target, boolean control)
-    {
-        if (control && System.currentTimeMillis() - toggleguard > 500) {
-            toggleguard = System.currentTimeMillis();
-            if (target == false) {
-                target = true;
-            } else {
-                target = false;
-            }
-        }
-        return target;
-    }
-
-    public double toggleDouble (double target, boolean control, double high, double low)
-    {
-        if (control && System.currentTimeMillis() - toggleguard > 500) {
-            toggleguard = System.currentTimeMillis();
-            if (target == high) {
-                target = low;
-            } else {
-                target = high;
-            }
-        }
-        return target;
-    }
-
-// ================================= ANGLE ADJUST ==========================================
-
-    public void angle_adjust (double control)
+    public void topTrackManual (double control, boolean hold)
     {
         if (control > .2)
         {
@@ -369,10 +291,40 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
             control = control/2;
             topTrack.setPower(control);
         }
+        else if (hold)
+        {
+            topTrack.setPower(.4);
+        }
         else
         {
             topTrack.setPower(0);
         }
+    }
+
+// ===================================== UTILITY METHODS ==================================
+
+    public boolean toggle(boolean target, boolean control) {
+        if (control && System.currentTimeMillis() - toggleguard > 500) {
+            toggleguard = System.currentTimeMillis();
+            if (target == false) {
+                target = true;
+            } else {
+                target = false;
+            }
+        }
+        return target;
+    }
+
+    public double toggleDouble(double target, boolean control, double high, double low) {
+        if (control && System.currentTimeMillis() - toggleguard > 500) {
+            toggleguard = System.currentTimeMillis();
+            if (target == high) {
+                target = low;
+            } else {
+                target = high;
+            }
+        }
+        return target;
     }
 }
 
