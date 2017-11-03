@@ -417,21 +417,25 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     public void unfoldRobo()
     {
-        moveTopTrack(-.5, 300);
+        moveTopTrack(-.6, 300);
     }
 
-    public void getGem(double extension, double threshold) {
-        double start = gemArm.getPosition();
+    public void getGem(double extension, double threshold, boolean isRed) {
         gemArm.setPosition(extension);
-        if (getBlue() > threshold && getRed() < threshold) {
-            gemFlick.setPosition(1);
-        } else if (getRed() > threshold && getBlue() < threshold) {
-            gemFlick.setPosition(0);
-        }
+//        if (getBlue() > threshold && getRed() < threshold) {
+//            if (isRed) {gemFlick.setPosition(1);}
+//            else {gemFlick.setPosition(0);}
+//        }
+//        else if (getRed() > threshold && getBlue() < threshold) {
+//            if(isRed) {gemFlick.setPosition(0);}
+//            else {gemFlick.setPosition(1);}
+//        }
         sleep(250);
-        gemFlick.setPosition(.5);
-        sleep(250);
-        gemArm.setPosition(start);
+    }
+
+    public void resetGemArm()
+    {
+        gemArm.setPosition(.5);
     }
 
     public void relic() {
