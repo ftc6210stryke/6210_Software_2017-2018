@@ -18,11 +18,13 @@ public class TeleOp_v3 extends TeleOpLibrary_v2
 {
     private double drivePowerMod;
     private boolean tank;
+    private boolean hold;
 
     @Override
     public void init() {
         drivePowerMod = .8;
         tank = false;
+        hold = false;
         initialize();
     }
 
@@ -57,9 +59,10 @@ public class TeleOp_v3 extends TeleOpLibrary_v2
             drive_tank(drivePowerMod);
         }
         //intake(gamepad1.a);
-        angle_adjust(gamepad2.left_stick_y);
+        topTrackManual(gamepad2.left_stick_y, hold);
         intake(gamepad2.right_bumper, gamepad2.left_bumper);
-        output(gamepad2.right_trigger > .1);
+        output(gamepad2.right_trigger > .1, gamepad2.left_trigger > .1 );
+        hold = toggle(hold, gamepad2.b);
         tank = toggle(tank, gamepad1.b);
         drivePowerMod = toggleDouble(drivePowerMod, gamepad1.x, .8, .2);
 
