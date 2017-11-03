@@ -74,6 +74,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         belt = hardwareMap.get(CRServo.class, "belt");
         rIntake = hardwareMap.get(CRServo.class, "rIn");
         lIntake = hardwareMap.get(CRServo.class, "lIn");
+        gemFlick = hardwareMap.get(Servo.class, "gF");
 
 //        fldrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        frdrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -84,8 +85,8 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
         vision_init();
 
-        colorSensor = hardwareMap.get(NormalizedColorSensor.class, "colorSensor");
-        gemSensor = hardwareMap.get(NormalizedColorSensor.class, "gemSensor");
+        gemSensor = hardwareMap.get(NormalizedColorSensor.class, "csGem");
+//        gemSensor = hardwareMap.get(NormalizedColorSensor.class, "gemSensor");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -98,6 +99,14 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+        gemFlick.setPosition(1);
+        sleep(100);
+        gemFlick.setPosition(.5);
+        sleep(100);
+        gemFlick.setPosition(0);
+        sleep(100);
+        gemFlick.setPosition(.5);
 
         waitForStart();
     }
@@ -158,7 +167,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     public void move_encoder(double ypower, double xpower, double distance) {
         double start = getEncoderAvg();
-        while (Math.abs(getEncoderAvg() - start) < distance) {
+        while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive()) {
             move_biaxis_basic(ypower, xpower);
         }
         stop_motors();
@@ -166,7 +175,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     public void turn_encoder(double power, double distance) {
         double start = getEncoderAvg();
-        while (Math.abs(getEncoderAvg() - start) < distance) {
+        while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive()) {
             turn_basic(power);
         }
         stop_motors();
@@ -248,7 +257,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     public void turn_gyro(double power, double targetAngle, double threshold)
     {
-        while (Math.abs(angle_delta(getAngle(), targetAngle)) > threshold)
+        while (Math.abs(angle_delta(getAngle(), targetAngle)) > threshold && opModeIsActive())
         {
             if (angle_delta(getAngle(), targetAngle) > 0)
             {
@@ -264,7 +273,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //====================== ENCODER + GYRO MOVE ======================
     public void move_advanced(double ypower, double xpower, double targetAngle, double threshold, double intensity, double distance) {
         double start = getEncoderAvg();
-        while (Math.abs(getEncoderAvg() - start) < distance) {
+        while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive()) {
             frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
             brdrive.setPower((ypower - xpower) * getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
             fldrive.setPower(-(ypower - xpower) * getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
@@ -279,7 +288,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         double error = distance;
         double totalError = 0;
         double prevTime = System.currentTimeMillis();
-        while (Math.abs(error) > threshold) {
+        while (Math.abs(error) > threshold && opModeIsActive()) {
             double currTime = System.currentTimeMillis();
             double deltaTime = currTime - prevTime;
             prevTime = currTime;
@@ -303,7 +312,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         double error = distance;
         double totalError = 0;
         double prevTime = System.currentTimeMillis();
-        while (Math.abs(error) > thresholdPID) {
+        while (Math.abs(error) > thresholdPID && opModeIsActive()) {
             double currTime = System.currentTimeMillis();
             double deltaTime = currTime - prevTime;
             prevTime = currTime;
@@ -326,7 +335,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         double error = Math.abs(angle_delta(getAngle(), targetAngle));
         double totalError = 0;
         double prevTime = System.currentTimeMillis();
-        while (Math.abs(error) > threshold)
+        while (Math.abs(error) > threshold && opModeIsActive())
         {
             double currTime = System.currentTimeMillis();
             double deltaTime = currTime - prevTime;
@@ -354,7 +363,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public void move2Line(double ypower, double xpower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed) {
         double start = getEncoderAvg();
         if (isRed) {
-            while (getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff) {
+            while (getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
                 frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
                 brdrive.setPower((ypower - xpower) + getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
                 fldrive.setPower(-(ypower - xpower) + getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
@@ -362,7 +371,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
             }
             stop_motors();
         } else {
-            while (getFloorBlue() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff) {
+            while (getFloorBlue() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
                 frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
                 brdrive.setPower((ypower - xpower) + getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
                 fldrive.setPower(-(ypower - xpower) + getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
@@ -395,7 +404,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     public void moveTopTrack(double power, double distance) {
         double start = topTrack.getCurrentPosition();
-        while (Math.abs(topTrack.getCurrentPosition() - start) < distance) {
+        while (Math.abs(topTrack.getCurrentPosition() - start) < distance && opModeIsActive()) {
             topTrack.setPower(-power);
         }
         topTrack.setPower(0);
@@ -421,21 +430,29 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     }
 
     public void getGem(double extension, double threshold, boolean isRed) {
-        gemArm.setPosition(extension);
-//        if (getBlue() > threshold && getRed() < threshold) {
-//            if (isRed) {gemFlick.setPosition(1);}
-//            else {gemFlick.setPosition(0);}
-//        }
-//        else if (getRed() > threshold && getBlue() < threshold) {
-//            if(isRed) {gemFlick.setPosition(0);}
-//            else {gemFlick.setPosition(1);}
-//        }
-        sleep(250);
+//        gemArm.setPosition(extension);
+        if (getBlue() > threshold && getRed() < threshold) {
+            telemetry.addLine("blue detected");
+            telemetry.update();
+            if (isRed) {gemFlick.setPosition(1);}
+            else {gemFlick.setPosition(0);}
+        }
+        else if (getRed() > threshold && getBlue() < threshold) {
+            telemetry.addLine("red detected");
+            telemetry.update();
+            if(isRed) {gemFlick.setPosition(0);}
+            else {gemFlick.setPosition(1);}
+        }
+        else {
+            telemetry.addLine("color sensing failed");
+            telemetry.update();
+        }
+        sleep(500);
     }
 
     public void resetGemArm()
     {
-        gemArm.setPosition(.5);
+        gemFlick.setPosition(.5);
     }
 
     public void relic() {
