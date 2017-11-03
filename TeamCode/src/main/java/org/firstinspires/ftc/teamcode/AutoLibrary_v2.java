@@ -64,10 +64,10 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     boolean hold = false;
 
     public void initialize() {
-        frdrive = hardwareMap.get(DcMotor.class, "a");
-        fldrive = hardwareMap.get(DcMotor.class, "b");
-        brdrive = hardwareMap.get(DcMotor.class, "c");
-        bldrive = hardwareMap.get(DcMotor.class, "d");
+        frdrive = hardwareMap.get(DcMotor.class, "fr");
+        fldrive = hardwareMap.get(DcMotor.class, "fl");
+        brdrive = hardwareMap.get(DcMotor.class, "br");
+        bldrive = hardwareMap.get(DcMotor.class, "bl");
         topTrack = hardwareMap.get(DcMotor.class, "topt");
         rOutput = hardwareMap.get(DcMotor.class, "rOut");
         lOutput = hardwareMap.get(DcMotor.class, "lOut");
