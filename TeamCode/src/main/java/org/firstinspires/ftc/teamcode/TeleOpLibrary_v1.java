@@ -243,11 +243,11 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         if (active) {
             if (angle_delta(getAngle(), targetAngle) < threshold)
             {
-                output = 1 + (ypower - xpower) / Math.abs(ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+                output = 1 - (ypower - xpower) / Math.abs(ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
             }
             else if (angle_delta(getAngle(), targetAngle) > threshold)
             {
-                output = 1 - (ypower - xpower) / Math.abs(ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+                output = 1 + (ypower - xpower) / Math.abs(ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
             }
         }
         return output;
@@ -260,10 +260,10 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         {
             if (angle_delta(getAngle(), targetAngle) < threshold)
             {
-                output = 1 + (ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+                output = 1 - (ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
             } else if (angle_delta(getAngle(), targetAngle) > threshold)
             {
-                output = 1 - (ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+                output = 1 + (ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
             }
         }
         return output;
@@ -276,11 +276,11 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         {
             if (angle_delta(getAngle(), targetAngle) < threshold)
             {
-                output = 1 + (-ypower - xpower) / Math.abs(-ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+                output = 1 - (-ypower - xpower) / Math.abs(-ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
             }
             else if (angle_delta(getAngle(), targetAngle) > threshold)
             {
-                output = 1 - (-ypower - xpower) / Math.abs(-ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+                output = 1 + (-ypower - xpower) / Math.abs(-ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
             }
         }
         return output;
@@ -292,11 +292,11 @@ public abstract class TeleOpLibrary_v1 extends OpMode {
         if (active) {
             if (angle_delta(getAngle(), targetAngle) < threshold)
             {
-                output = 1 + (-ypower + xpower) / Math.abs(-ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+                output = 1 - (-ypower + xpower) / Math.abs(-ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
             }
             else if (angle_delta(getAngle(), targetAngle) > threshold)
             {
-                output = 1 - (-ypower + xpower) / Math.abs(-ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+                output = 1 + (-ypower + xpower) / Math.abs(-ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
             }
         }
         return output;
