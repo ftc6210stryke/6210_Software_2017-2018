@@ -12,7 +12,23 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 public class GemRedInner extends AutoLibrary_v2{
 
     private ElapsedTime runtime = new ElapsedTime();
-    private RelicRecoveryVuMark
+    private RelicRecoveryVuMark targetColumn
+
+    @Override
+    public void runOpMode () {
+
+        initialize();
+        waitForStart();
+        double angle = getAngle();
+        move_advanced(.3, 0, angle, 2, 1, 200);
+        turn_gyro(.3, angle, 3);
+        getGem(1, 3, true);
+        move_advanced(-.3, 0, angle, 2, 1, 100);
+        move_advanced(0, -.3, angle, 2, 1, 500);
+
+
+
+    }
 
 
 }
