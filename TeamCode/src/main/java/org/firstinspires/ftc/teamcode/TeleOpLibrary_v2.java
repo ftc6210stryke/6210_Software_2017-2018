@@ -183,16 +183,16 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
     public void intake(boolean control, boolean control_reverse) {
         if (control) {
-            lIntake.setPower(-.6);
-            rIntake.setPower(.6);
-            belt.setPower(.6);
+            lIntake.setPower(-.8);
+            rIntake.setPower(.8);
+            belt.setPower(.8);
             telemetry.addLine("intake command recieved");
             telemetry.update();
 
         } else if (control_reverse) {
-            lIntake.setPower(.6);
-            rIntake.setPower(-.6);
-            belt.setPower(0);
+            lIntake.setPower(.8);
+            rIntake.setPower(-.8);
+            belt.setPower(-.8);
         } else {
             lIntake.setPower(0);
             rIntake.setPower(0);
@@ -277,23 +277,23 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
     public void topTrackManual (double control, boolean hold)
     {
-        if (control > .2)
+        if (control < -.2)
         {
             control = control/2;
-            topTrack.setPower(-control);
+            topTrack.setPower(control);
         }
-        else if (control < -.2)
+        else if (control > .2)
         {
-            control = control*2;
+            control = control*1.5;
             if (control > 1)
             {
                 control = 1;
             }
-            topTrack.setPower(-control);
+            topTrack.setPower(control);
         }
         else if (hold)
         {
-            topTrack.setPower(.4);
+                topTrack.setPower(.4);
         }
         else
         {
