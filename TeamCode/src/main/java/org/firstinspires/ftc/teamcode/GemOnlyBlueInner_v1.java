@@ -29,10 +29,10 @@ public class GemOnlyBlueInner_v1 extends AutoLibrary_v2{
         initialize();
         waitForStart();
         double angle = getAngle();
-        move_advanced(.3, 0, angle, 2, 1, 200);
-        turn_gyro(.3, angle, 3);
+        move_encoder(-.3, 0, 25);
         getGem(1, 3, false);
-        move_advanced(-.3, 0, angle, 2, 1, 100);
-        move_advanced(0, -.3, angle, 2, 1 , 500);
+        move_encoder(.3, 0, 100);
+        resetGemArm();
+        move_encoder(0, .3, 250);
 }
 }
