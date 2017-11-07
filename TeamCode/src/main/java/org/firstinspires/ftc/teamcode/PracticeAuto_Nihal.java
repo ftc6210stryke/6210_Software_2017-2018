@@ -28,12 +28,14 @@ public class PracticeAuto_Nihal extends linearOpMode{
     public DcMotor fldrive;
     public DcMotor frdrive;
     public double angle;
+    public ColorSensor groundSensor;
 
     public void initialize() {
         frdrive = hardwareMap.get(DcMotor.class, "a");
         fldrive = hardwareMap.get(DcMotor.class, "b");
         brdrive = hardwareMap.get(DcMotor.class, "c");
         bldrive = hardwareMap.get(DcMotor.class, "d");
+        groundSensor = hardwareMap.get(ColorSensor.class, "cs")
         fldrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frdrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fldrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -58,6 +60,8 @@ public class PracticeAuto_Nihal extends linearOpMode{
     }
 
     @Override
+
+//******************************************************* Move in a Box *************************************************************
     public void runOpMode() {
         initialize();
         distance(1, 500);
@@ -70,6 +74,8 @@ public class PracticeAuto_Nihal extends linearOpMode{
 
     }
 
+
+//******************************************** Basic Movements **********************************************************************
     public void move_basic(double power) {
         frdrive.setPower(power);
         brdrive.setPower(power);
@@ -84,6 +90,7 @@ public class PracticeAuto_Nihal extends linearOpMode{
         bldrive.setPower(power);
     }
 
+//******************************************************* Gyro Turn *****************************************************************
     public void turn_gyro(double power, double angle)
     {
         while (math.abs(angle - getAngle()) > 3) {
@@ -98,12 +105,14 @@ public class PracticeAuto_Nihal extends linearOpMode{
         turn(0);
     }
 
+//**************************************************** Get Angle ********************************************************************
     public double getAngle()
     {
         angles   = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return angles.firstAngle;
     }
 
+//************************************************* Get Encoder ***********************************************************************
     public double getEncoderAverage()
     {
         average = (fldrive.getCurrentPosition() + frdrive.getCurrentPosition() + bldrive.getCurrentPosition() + brdrive.getCurrentPosition())/4;
@@ -120,6 +129,7 @@ public class PracticeAuto_Nihal extends linearOpMode{
         move_basic(0);
     }
 
+//************************************************ Move Corrections *****************************************************************
     public void move_corrections(double power, double threshold, double intensity)
     {
         frdrive.setPower(power * correction_R(threshold, intensity));
@@ -144,6 +154,17 @@ public class PracticeAuto_Nihal extends linearOpMode{
     {
 
     }
+
+//******************************************************Color Sensor Move to Line************************************************************************
+    public void groundSensor_move_to_line(double power){
+        double.encoder_Start = getEncoderAvg();
+        while (opModeIsActive() && groundSensor.alpha < 100 && Math.abs(getEncoderAverage() - encoder_Start < 100)) {
+            move_basic(power);
+        }
+        move_basic(0);
+
+    }
+
 
 }
 
