@@ -21,6 +21,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
+@Disabled
 @Autonomous (name="AutoBlueInner_v1", group="Auto")
 public class AutoBlueInner_v1 extends AutoLibrary_v1{
 
