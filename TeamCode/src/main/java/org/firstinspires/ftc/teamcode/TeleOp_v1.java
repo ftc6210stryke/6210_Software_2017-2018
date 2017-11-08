@@ -201,6 +201,15 @@ public class TeleOp_v1 extends OpMode
             }
         }
 
+/*        if press button && time elapsed since last press > x time
+                toggletime = time;
+                if toggle = false (off)
+                    toggle = true (on)
+                    change something
+                 if toggle = true (on)
+                    toggle = false (off)
+                    change back*/
+
         telemetry.addData("Status", "Run Time: " + runtime.toString());
         telemetry.addData("Joystick", "xpower (%.2f), ypower (%.2f)", xpower, ypower);
     }
