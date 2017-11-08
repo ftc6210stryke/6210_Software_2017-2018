@@ -14,6 +14,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -42,18 +43,21 @@ public abstract class Practice_Auto extends LinearOpMode {
     public DcMotor brdrive;
     public DcMotor fldrive;
     public DcMotor frdrive;
+    public ColorSensor cs;
 
     public void initialize() {
         frdrive = hardwareMap.get(DcMotor.class, "a");
         fldrive = hardwareMap.get(DcMotor.class, "b");
         brdrive = hardwareMap.get(DcMotor.class, "c");
         bldrive = hardwareMap.get(DcMotor.class, "d");
+        cs = hardwareMap.get(ColorSensor.class, "cs");
         fldrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frdrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fldrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frdrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         brdrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         bldrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        
 
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -70,9 +74,8 @@ public abstract class Practice_Auto extends LinearOpMode {
 
         waitForStart();
     }
-
-
-    //====================== BASIC MOVEMENT METHODS ======================
+    
+    //==================================================== BASIC MOVEMENT METHODS ===================================================
 
     public void move_yaxis_basic(double power) {
         frdrive.setPower(power);
@@ -94,7 +97,9 @@ public abstract class Practice_Auto extends LinearOpMode {
         fldrive.setPower(0);
         brdrive.setPower(0);
     }
-
+    
+    //================================================ Gyro Turn ===================================================================
+    
     public void gyro_turn(double target_angle, double threshold) {
         double currentAngle = getAngle();
         while (Math.abs(target_angle - getAngle()) > threshold)
@@ -109,6 +114,8 @@ public abstract class Practice_Auto extends LinearOpMode {
         stop_motors();
     }
 
+    //================================================= Gyro Correct ==================================================================
+    
     public void move_gyro_correct(double power, double targetAngle, double threshold)
     {
         frdrive.setPower(power * getRcorrect(targetAngle, threshold));
@@ -135,9 +142,30 @@ public abstract class Practice_Auto extends LinearOpMode {
         return 1;
     }
 
+    //================================================= Get Encoder =====================================================================
+    
+    public double getEncoderAvg()
+    {
+        return (frdrive.getCurrentPosition() + fldrive.getCurrentPosition() + brdrive.getCurrentPosition() + bldrive.getCurrentPosition())/4;
+    }
+    
+    //=============================================== Get Angle ============================================================================
+    
     public double getAngle()
     {
         angles = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return angles.firstAngle;
+    }
+    
+    //=============================================Color Sensor Move to Line=============================================================
+    
+    public void cs_move_to_line(double power)
+    {
+        double encoder_Start = getEncoderAvg();
+        while (opModeIsActive() && cs.alpha() < 100 && (Math.abs(getEncoderAvg() - encoder_Start)) < 100);
+        {
+            move_yaxis_basic(power);
+        }
+            stop_motors();
     }
 }

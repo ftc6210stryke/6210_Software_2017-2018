@@ -15,6 +15,8 @@ public class Practice_TeleOP extends OpMode{
     DcMotor bldrive;
     double xpower;
     double ypower;
+    boolean half_speed_on;
+    double toggletime;
 
 
     public void init()
@@ -25,8 +27,12 @@ public class Practice_TeleOP extends OpMode{
         bldrive = hardwareMap.get(DcMotor.class, "b");
         xpower = 0;
         ypower = 0;
+        half_speed_on = false;
+        double toggletime = (System.currentTimeMillis());
 
     }
+
+    //=============================================== Mecanum Drive Loop ==============================================================
 
     public void loop()
     {
@@ -41,13 +47,34 @@ public class Practice_TeleOP extends OpMode{
      {
          ypower = 0;
      }
+     if (half_speed_on)
+     {
+         ypower = ypower/2;
+         xpower = xpower/2;
+     }
         fldrive.setPower(ypower + xpower);
         frdrive.setPower(ypower - xpower);
         brdrive.setPower(-(ypower + xpower));
         bldrive.setPower(-(ypower - xpower));
+        half_speed();
+    }
 
+    //=================================================Toggle (with example of half speed) ===============================================
 
+    public void half_speed()
+    {
 
+        if (gamepad1.b && (System.currentTimeMillis() - toggletime > 100))
+        {
+            toggletime = System.currentTimeMillis();
+            if (!half_speed_on) {
+                half_speed_on = true;
+            }
+            else
+            {
+               half_speed_on = false;
+            }
+        }
     }
 
 }
