@@ -33,7 +33,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 
-public abstract class Practice_Auto extends LinearOpMode {
+public abstract class Practice_Auto_Library_Rohit extends LinearOpMode {
 
     BNO055IMU gyro;
     Orientation angles;
