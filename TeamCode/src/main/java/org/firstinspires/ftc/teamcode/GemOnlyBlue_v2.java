@@ -13,14 +13,12 @@ autonomous period of FTC's Relic Recovery competition.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-@Disabled
-@Autonomous (name="GemOnlyRedOuter_v1", group="Auto")
-public class GemOnlyRedOuter_v1 extends AutoLibrary_v2{
+@Autonomous (name="GemOnlyBlue_v2.2", group="Auto")
+public class GemOnlyBlue_v2 extends AutoLibrary_v2{
 
     private ElapsedTime runtime = new ElapsedTime();
     private RelicRecoveryVuMark targetColumn;
@@ -29,12 +27,20 @@ public class GemOnlyRedOuter_v1 extends AutoLibrary_v2{
     public void runOpMode() throws InterruptedException {
 
         initialize();
-        waitForStart();
-        double angle = getAngle();
-        move_encoder(-.3, 0, 25);
-        getGem(1, 1, true);
-        move_encoder(.3, 0, 25);
-        resetGemArm();
-        move_encoder(0, -.3, 500);
-    }
+        double time = System.currentTimeMillis();
+        while (Math.abs(System.currentTimeMillis() - time) < 400)
+        {
+            move_yaxis_basic(-.35);
+        }
+        stop_motors();
+        getGem(1, 3, false);
+        time = System.currentTimeMillis();
+        while (Math.abs(System.currentTimeMillis() - time) < 600)
+        {
+            move_yaxis_basic(.35);
+        }
+        stop_motors();
+        gemFlick.setPosition(1 - gemFlick.getPosition());
+        sleep(100);
+}
 }

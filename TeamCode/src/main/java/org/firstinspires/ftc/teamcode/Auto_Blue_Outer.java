@@ -13,8 +13,10 @@ autonomous period of FTC's Relic Recovery competition.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+@Disabled
 @Autonomous (name="MainAuto_v1.0", group="Auto")
 public class Auto_Blue_Outer extends AutoLibrary_v1{
 

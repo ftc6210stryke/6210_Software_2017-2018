@@ -15,6 +15,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
@@ -39,7 +40,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     Orientation angles;
     Acceleration gravity;
     NormalizedColorSensor colorSensor;
-    NormalizedColorSensor gemSensor;
+    ColorSensor gemSensor;
 
     public static final String TAG = "Vuforia VuMark Sample";
     OpenGLMatrix lastLocation = null;
@@ -63,7 +64,8 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     boolean hold = false;
 
-    public void initialize() {
+    //method initialize's the robot
+    public void initialize() throws InterruptedException {
         frdrive = hardwareMap.get(DcMotor.class, "fr");
         fldrive = hardwareMap.get(DcMotor.class, "fl");
         brdrive = hardwareMap.get(DcMotor.class, "br");
@@ -83,9 +85,9 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 //        brdrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        bldrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        vision_init();
+//        vision_init();
 
-        gemSensor = hardwareMap.get(NormalizedColorSensor.class, "csGem");
+        gemSensor = hardwareMap.get(ColorSensor.class, "csGem");
 //        gemSensor = hardwareMap.get(NormalizedColorSensor.class, "gemSensor");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
@@ -100,17 +102,12 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        gemFlick.setPosition(1);
-        sleep(100);
-        gemFlick.setPosition(.5);
-        sleep(100);
-        gemFlick.setPosition(0);
-        sleep(100);
         gemFlick.setPosition(.5);
 
         waitForStart();
     }
 
+    // Method condenses init of Vuforia for readability
     public void vision_init() {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
@@ -123,7 +120,9 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     }
 
     //====================== BASIC MOVEMENT METHODS ======================
+    //These methods set motor power only
 
+    //set motors to power such that they move in the y-axis
     public void move_yaxis_basic(double power) {
         frdrive.setPower(power);
         brdrive.setPower(power);
@@ -131,6 +130,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         bldrive.setPower(-power);
     }
 
+    //set motors to power such that they move in the x-axis
     public void move_x_axis_basic(double power) {
         frdrive.setPower(power);
         brdrive.setPower(-power);
@@ -138,6 +138,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         bldrive.setPower(-power);
     }
 
+    //set motors to power such that they move in any direction in the xy plane
     public void move_biaxis_basic(double ypower, double xpower) {
         frdrive.setPower(ypower + xpower);
         brdrive.setPower(ypower - xpower);
@@ -145,26 +146,31 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         bldrive.setPower(-(ypower + xpower));
     }
 
+    //set motors to power such that the robot turns in place
     public void turn_basic(double power) {
         frdrive.setPower(-power);
         brdrive.setPower(-power);
         fldrive.setPower(-power);
-        brdrive.setPower(-power);
+        bldrive.setPower(-power);
     }
 
+    //stop motors
     public void stop_motors() {
         frdrive.setPower(0);
         brdrive.setPower(0);
         fldrive.setPower(0);
-        brdrive.setPower(0);
+        bldrive.setPower(0);
     }
 
     //====================== ENCODER ONLY MOVEMENT METHODS ======================
+    //Uses encoders to move the robot a set distance
 
+    //recieves average enccoder value between the 4 drive motors
     public double getEncoderAvg() {
         return ((frdrive.getCurrentPosition() + fldrive.getCurrentPosition() + brdrive.getCurrentPosition() + bldrive.getCurrentPosition()) / 4);
     }
 
+    //Uses encoders to move a set distance in xy plane
     public void move_encoder(double ypower, double xpower, double distance) {
         double start = getEncoderAvg();
         while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive()) {
@@ -173,6 +179,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         stop_motors();
     }
 
+    //Uses encoders to turn a set distance (not angle)
     public void turn_encoder(double power, double distance) {
         double start = getEncoderAvg();
         while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive()) {
@@ -182,9 +189,11 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     }
 
     //====================== GYRO CORRECTION MOVEMENT ===================
+    //Specific gyro correction movement methods, mostly support.
+    //Use gyro to get accurate turn or correction angle while moving
 
-    //DO NOT SET POWER ABOVE .8 when using standard intensity (1)
-    //Intensity should be a decimal number close to 1, not greater than 1.5
+    //Returns shortest difference between two angles (relative angle), accounting for 360 to 0 skip
+    //Use this whenever calculating angle difference
     public double angle_delta(double currentAngle, double targetAngle) {
         double delta = targetAngle - currentAngle;
         if (delta < -180) {
@@ -197,8 +206,14 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         return delta;
     }
 
+    /* Motor correction methods
+    The next four methods use the gyro to edit the power of a specific motor. This allows the robot correct it's angle.
+    * The method returns a coeffienct that the motor power must be multiplied by.
+    * Never use power of .8 when using intensity of 1.
+    * Ypower power formula is unique for each motor - that's why there is four methods
 
-    // NOTE flipped y power values on all corrections since y axis was working in general formula. If doesn't work, switch between two linear corrections for auto
+    NOTE flipped y power values on all corrections since y axis was working in general formula. If doesn't work, switch between two linear corrections for auto
+    */
     public double getfrcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity)
     {
         double output = 1;
@@ -255,6 +270,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         return output;
     }
 
+    //uses gyro to turn a set angle
     public void turn_gyro(double power, double targetAngle, double threshold)
     {
         while (Math.abs(angle_delta(getAngle(), targetAngle)) > threshold && opModeIsActive())
@@ -271,6 +287,9 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     }
 
     //====================== ENCODER + GYRO MOVE ======================
+
+    // Combines encoder and gyro movement for a angle corrected move at a set distance
+    // Never use power of .8 when using intensity of 1.
     public void move_advanced(double ypower, double xpower, double targetAngle, double threshold, double intensity, double distance) {
         double start = getEncoderAvg();
         while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive()) {
@@ -282,8 +301,40 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         stop_motors();
     }
 
-    //====================== PID =============================
+    //====================== TIME ONLY MOVEMENT METHODS ======================
+    //These methods use time to move a set distance (as opposed to encoder)
 
+    //Uses time to move a set distance
+    public void move_timed(double xpower, double ypower, double duration)
+    {
+        double start = System.currentTimeMillis();
+        while (Math.abs(System.currentTimeMillis() - start) < duration && opModeIsActive())
+        {
+            move_biaxis_basic(ypower, xpower);
+        }
+        stop_motors();
+    }
+
+    //Uses time to move a set distance with angle corrections
+    public void move_advanced_timed(double ypower, double xpower, double targetAngle, double threshold, double intensity, double duration)
+    {
+        double start = System.currentTimeMillis();
+        while (Math.abs(System.currentTimeMillis() - start) < duration && opModeIsActive()) {
+            frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
+            brdrive.setPower((ypower - xpower) * getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
+            fldrive.setPower(-(ypower - xpower) * getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
+            bldrive.setPower(-(ypower + xpower) * getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
+        }
+        stop_motors();
+    }
+
+    //====================== PID =============================
+    //Advanced movement method which uses calculus move an very precise set distance.
+
+    //Uses PID to move a very precise set distance
+    //kporp - Proportional - power is proportional to distance remaining (ERROR) - slowing down near the end
+    //kintg - Integral - power is risen based on ERROR*TIME - counterbalancing kprop and ensuring it reachs 0 error
+    //kderv - Derivative - power is based on rate of change rate of change of error - predicts future path and corrects for it
     public void move_PID(double ypower, double xpower, double kporp, double kintg, double kderv, double distance, double threshold) {
         double error = distance;
         double totalError = 0;
@@ -308,6 +359,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     //======================= PID + GRYO =========================
 
+    //move method using both PID and gyro correction for a very precise move
     public void move_advancedplus(double ypower, double xpower, double kporp, double kintg, double kderv, double distance, double angle, double thresholdPID, double thresholdGyro, double intensityGryo) {
         double error = distance;
         double totalError = 0;
@@ -330,6 +382,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         stop_motors();
     }
 
+    //turn method that uses PID logic with the gyro for a very accurate turn (ERROR = angle remaining)
     public void turn_PID(double power, double kporp, double kintg, double kderv, double targetAngle, double threshold)
     {
         double error = Math.abs(angle_delta(getAngle(), targetAngle));
@@ -360,96 +413,156 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     //====================== SPECIALIZED MOVEMENT / PATH-ING ========================
 
+    //Movement method (w/ gryo correction) that moves till it finds a taped line on the floor. IsRed controls whether it detects blue or red lines
     public void move2Line(double ypower, double xpower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed) {
         double start = getEncoderAvg();
         if (isRed) {
             while (getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
                 frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                brdrive.setPower((ypower - xpower) + getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                fldrive.setPower(-(ypower - xpower) + getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                bldrive.setPower(-(ypower + xpower) + getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                brdrive.setPower((ypower - xpower) * getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                fldrive.setPower(-(ypower - xpower) * getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                bldrive.setPower(-(ypower + xpower) * getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
             }
-            stop_motors();
         } else {
             while (getFloorBlue() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
                 frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                brdrive.setPower((ypower - xpower) + getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                fldrive.setPower(-(ypower - xpower) + getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                bldrive.setPower(-(ypower + xpower) + getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                brdrive.setPower((ypower - xpower) * getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                fldrive.setPower(-(ypower - xpower) * getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                bldrive.setPower(-(ypower + xpower) * getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
             }
 
         }
         stop_motors();
     }
 
+    //above - but with power oscillating from on to 0. Motion makes color sensors inaccurate, so staggering motion may improve accuracy
+    public void move2Line_stagger(double ypower, double xpower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed) {
+        double start = getEncoderAvg();
+        if (isRed) {
+            while (getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
+                frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                brdrive.setPower((ypower - xpower) * getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                fldrive.setPower(-(ypower - xpower) * getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                bldrive.setPower(-(ypower + xpower) * getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                sleep(100);
+                stop_motors();
+                sleep(50);
+            }
+        } else {
+            while (getFloorBlue() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
+                frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                brdrive.setPower((ypower - xpower) * getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                fldrive.setPower(-(ypower - xpower) * getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                bldrive.setPower(-(ypower + xpower) * getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                sleep(100);
+                stop_motors();
+                sleep(50);
+            }
+        }
+        stop_motors();
+    }
+
     //====================== MANIPULATORS ===================================
 
+    //starts intake motors. will run until stopped
     public void startIntake(double power) {
         lIntake.setPower(-power);
         rIntake.setPower(power);
         belt.setPower(power);
     }
 
+    //stops intake motors
     public void stopIntake() {
         startIntake(0);
     }
 
+    //starts output motors, will run until stopped
     public void startOutput(double power)
     {
         lOutput.setPower(-power);
         rOutput.setPower(power);
     }
 
+    //stops output motors
     public void stopOutput() { startOutput(0); }
 
+    //Moves top track a set distance based on encoder values
     public void moveTopTrack(double power, double distance) {
         double start = topTrack.getCurrentPosition();
         while (Math.abs(topTrack.getCurrentPosition() - start) < distance && opModeIsActive()) {
             topTrack.setPower(-power);
         }
-        topTrack.setPower(0);
+        if (hold)
+        {
+            topTrack.setPower(.4);
+        }
+        else
+        {
+            topTrack.setPower(0);
+        }
     }
 
+    //toggles whether the top track should hold or not
     public void holdTopTrackToggle(double power)
     {
         if (!hold)
         {
             hold = true;
-            topTrack.setPower(power);
         }
         else
         {
             hold = false;
-            topTrack.setPower(0);
         }
     }
 
+    //unfolds robot (do not use with hold)
     public void unfoldRobo()
     {
         moveTopTrack(-.6, 300);
     }
 
-    public void getGem(double extension, double threshold, boolean isRed) {
+    //Uses gem Flick servo and color sensor to detect the the jewel and knock off the correct one
+    //returns true if successful
+    public boolean getGem(double extension, int threshold, boolean isRed) {
 //        gemArm.setPosition(extension);
-        if (getBlue() > threshold && getRed() < threshold) {
+        telemetry.addLine("starting getGEM");
+        telemetry.update();
+        sleep(100);
+        if (getBlue() > getRed() && getBlue() > threshold) {
             telemetry.addLine("blue detected");
             telemetry.update();
             if (isRed) {gemFlick.setPosition(1);}
             else {gemFlick.setPosition(0);}
+            sleep(500);
+            return true;
         }
-        else if (getRed() > threshold && getBlue() < threshold) {
+        else if (getRed() > getBlue() && getRed() > threshold) {
             telemetry.addLine("red detected");
             telemetry.update();
             if(isRed) {gemFlick.setPosition(0);}
             else {gemFlick.setPosition(1);}
+            sleep(500);
+            return true;
         }
         else {
             telemetry.addLine("color sensing failed");
             telemetry.update();
+            sleep(100);
+            return false;
         }
-        sleep(500);
     }
 
+    //Above, but makes multiple attempts
+    public void getGemMultitry(double extension, int threshold, boolean isRed, int tries, double angle)
+    {
+        for (int i = 1; i < tries; i++) {
+            if (!getGem(extension, threshold, isRed)) {
+                turn_gyro(.2, angle, 2);
+            }
+        }
+    }
+
+    //sets gem arm back to start position, .5
     public void resetGemArm()
     {
         gemFlick.setPosition(.5);
@@ -461,38 +574,48 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     //====================== SENSORS ======================
 
+    //returns the z axis angle from the robot
     public double getAngle()
     {
         angles   = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
         return angles.firstAngle;
     }
 
-
+    //returns the red value from the gemsensor
     public double getRed() {
-        NormalizedRGBA colors = gemSensor.getNormalizedColors();
-        return colors.red;
+        telemetry.addData("red", gemSensor.red());
+        telemetry.update();
+        sleep(500);
+        return gemSensor.red();
     }
 
+    //returns the blue value from the gemsensor
     public double getBlue() {
-        NormalizedRGBA colors = gemSensor.getNormalizedColors();
-        return colors.blue;
+        telemetry.addData("blue", gemSensor.blue());
+        telemetry.update();
+        sleep(500);
+        return gemSensor.blue();
     }
 
+    //get the alpha value forom the gem sensor
     public double getBrightness() {
-        NormalizedRGBA colors = gemSensor.getNormalizedColors();
-        return colors.alpha;
+        return gemSensor.alpha();
     }
 
+    //gets the red value from the floor
     public double getFloorRed() {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         return colors.red;
     }
 
+    //gets the blue value from the floor
     public double getFloorBlue() {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         return colors.blue;
     }
 
+    //Uses vuforia to detect the mark
+    //Note - RelicRecoveryVuMark is a Class unique to vuforia code - think of it as a data type like boolean or double
     //can return RelicRecoveryVuMark.UNKNOWN, R-.RIGHT, R-.LEFT, or R-.CENTER
     public RelicRecoveryVuMark getSymbol() {
         relicTrackables.activate();
@@ -501,6 +624,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         return vuMark;
     }
 
+    //Above, but attempts multiple times
     public RelicRecoveryVuMark getSymbol_multitry(int tries, double angle)
     {
         relicTrackables.activate();
@@ -510,6 +634,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
                 turn_gyro(.2, angle, 2);
                 vuMark = RelicRecoveryVuMark.from(relicTemplate);
             }
+            sleep(100);
         }
         return  vuMark;
     }
