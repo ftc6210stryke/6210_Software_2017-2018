@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  * Created by Rohit on 10/17/17.
  */
 
-public class Practice_TeleOP extends OpMode{
+public class Practice_TeleOP_Rohit extends OpMode{
 
     DcMotor frdrive;
     DcMotor fldrive;
