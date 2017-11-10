@@ -90,11 +90,11 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         gemSensor = hardwareMap.get(ColorSensor.class, "csGem");
 //        gemSensor = hardwareMap.get(NormalizedColorSensor.class, "gemSensor");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        parameters.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
-        parameters.loggingEnabled      = true;
-        parameters.loggingTag          = "GRYO";
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "GRYO";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         gyro = hardwareMap.get(BNO055IMU.class, "gyro");
         gyro.initialize(parameters);
@@ -108,7 +108,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     }
 
     // Method condenses init of Vuforia for readability
-    public void vision_init() {
+    public void vision_init() throws InterruptedException {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "ARUX4tP/////AAAAGXY2Dg+/sUl6gWdYntfHvN8GT9v/tqySPvCz3Nt2dTXFWQC7TJriGnCTY/vvHRRUFiSSI11yfUxGSTkNzXbHM0zBmGf3WiW6+kZsArc76UHXbUG1fHmPyIAljbqRBiNz8Kki/PlrJCwpNwmcZKNu8wvnYzGZ5phfZHXE6yyr2HvuEyX6IEYUvrvDtMImiHWHSbjK5wbgDyMinQU/FsVmDy0S1OHL+xVDk6yhjBsPBO2bsVMTKA3GRZAo+Qxjqd9nh95+jPt1EbE11VgPHzr/Zm8bKrr+gz24uxfsTgXU3sc6YLgdcegkRd6dxM5gvsu4xisSks+gkLismFPmNASP0JpDkom80KZ9MmEcbl7GnLO+";
@@ -198,9 +198,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         double delta = targetAngle - currentAngle;
         if (delta < -180) {
             delta += 360;
-        }
-        else if (delta > 180)
-        {
+        } else if (delta > 180) {
             delta -= 360;
         }
         return delta;
@@ -214,58 +212,64 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     NOTE flipped y power values on all corrections since y axis was working in general formula. If doesn't work, switch between two linear corrections for auto
     */
-    public double getfrcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity)
-    {
+    public double getfrcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity) {
         double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < threshold)
-        {
-            output = 1 - (-ypower - xpower) / Math.abs(ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        }
-        else if (angle_delta(getAngle(), targetAngle) > threshold)
-        {
-            output = 1 + (-ypower - xpower) / Math.abs(ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        if (angle_delta(getAngle(), targetAngle) < -threshold) {
+            output = 1 - (ypower - xpower) / Math.abs(ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
+            output = 1 + (ypower - xpower) / Math.abs(ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
         }
         return output;
     }
 
-    public double getbrcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity)
-    {
+    public double getbrcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity) {
         double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < threshold)
-        {
-            output = 1 - (-ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        }
-        else if (angle_delta(getAngle(), targetAngle) > threshold)
-        {
-            output = 1 + (-ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        if (angle_delta(getAngle(), targetAngle) < -threshold) {
+            output = 1 - (ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
+            output = 1 + (ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
         }
         return output;
     }
 
-    public double getflcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity)
-    {
+    public double getflcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity) {
         double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < threshold)
-        {
-            output = 1 - (ypower - xpower) / Math.abs(-ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        }
-        else if (angle_delta(getAngle(), targetAngle) > threshold)
-        {
-            output = 1 + (ypower - xpower) / Math.abs(-ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        if (angle_delta(getAngle(), targetAngle) < -threshold) {
+            output = 1 - (-ypower - xpower) / Math.abs(-ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
+            output = 1 + (-ypower - xpower) / Math.abs(-ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
         }
         return output;
     }
 
-    public double getblcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity)
-    {
+    public double getblcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity) {
         double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < threshold)
-        {
-            output = 1 - (-ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        if (angle_delta(getAngle(), targetAngle) < -threshold) {
+            output = 1 - (-ypower + xpower) / Math.abs(-ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
+            output = 1 + (-ypower + xpower) / Math.abs(-ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
         }
-        else if (angle_delta(getAngle(), targetAngle) > threshold)
-        {
-            output = 1 + (-ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        return output;
+    }
+
+    //Following two methods are for 1 axis correction along either the y-axis or x-axis
+
+    public double getRorBcorrection_1Axis(double targetAngle, double threshold, double intensity) {
+        double output = 1;
+        if (angle_delta(getAngle(), targetAngle) < -threshold) {
+            output = 1 - Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
+            output = 1 + Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        }
+        return output;
+    }
+
+    public double getLorFcorrection_1Axis(double targetAngle, double threshold, double intensity) {
+        double output = 1;
+        if (angle_delta(getAngle(), targetAngle) < -threshold) {
+            output = 1 + Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
+            output = 1 - Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
         }
         return output;
     }
