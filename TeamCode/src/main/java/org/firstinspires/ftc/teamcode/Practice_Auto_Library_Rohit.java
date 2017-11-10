@@ -44,6 +44,7 @@ public abstract class Practice_Auto_Library_Rohit extends LinearOpMode {
     public DcMotor fldrive;
     public DcMotor frdrive;
     public ColorSensor cs;
+    public ColorSensor gs;
 
     public void initialize() {
         frdrive = hardwareMap.get(DcMotor.class, "a");
@@ -51,6 +52,7 @@ public abstract class Practice_Auto_Library_Rohit extends LinearOpMode {
         brdrive = hardwareMap.get(DcMotor.class, "c");
         bldrive = hardwareMap.get(DcMotor.class, "d");
         cs = hardwareMap.get(ColorSensor.class, "cs");
+        gs = hardwareMap.get(ColorSensor.class, "gs");
         fldrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frdrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         fldrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -159,13 +161,32 @@ public abstract class Practice_Auto_Library_Rohit extends LinearOpMode {
     
     //=============================================Color Sensor Move to Line=============================================================
     
-    public void cs_move_to_line(double power)
+    public void cs_move_to_line(double power, double targetAngle, double threshold)
     {
         double encoder_Start = getEncoderAvg();
         while (opModeIsActive() && cs.alpha() < 100 && (Math.abs(getEncoderAvg() - encoder_Start)) < 100);
         {
-            move_yaxis_basic(power);
+            move_gyro_correct(power, targetAngle, threshold);
+
         }
             stop_motors();
+    }
+
+    //============================================= Move Encoder ======================================================================
+
+    public void move_encoder(double power, double distance, double threshold)
+    {
+        while (Math.abs(distance - getEncoderAvg()) > threshold)
+        {
+            move_yaxis_basic(power);
+        }
+        stop_motors();
+    }
+
+    //============================================ Get Gem ===========================================================================
+
+    public void getGem(double power, )
+    {
+        gs.blue();
     }
 }
