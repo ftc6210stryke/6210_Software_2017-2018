@@ -15,6 +15,7 @@ import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -29,17 +30,19 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public DcMotor fldrive;
     public DcMotor frdrive;
     public DcMotor topTrack;
-    public DcMotor rOutput;
-    public DcMotor lOutput;
+    public DcMotor rIntake;
+    public DcMotor lIntake;
     public CRServo belt;
-    public CRServo rIntake;
-    public CRServo lIntake;
+    public CRServo rOutput;
+    public CRServo lOutput;
     public double ypower;
     public double xpower;
     public double rturnpower;
     public double lturnpower;
     public double toggleguard;
     public int outputLevel;
+    public Servo gemArm;
+    public Servo gemFlick;
 
     public void initialize() {
         frdrive = hardwareMap.get(DcMotor.class, "fr");
@@ -47,11 +50,13 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         brdrive = hardwareMap.get(DcMotor.class, "br");
         bldrive = hardwareMap.get(DcMotor.class, "bl");
         topTrack = hardwareMap.get(DcMotor.class, "topt");
-        rOutput = hardwareMap.get(DcMotor.class, "rOut");
-        lOutput = hardwareMap.get(DcMotor.class, "lOut");
+        rIntake = hardwareMap.get(DcMotor.class, "rIn");
+        lIntake = hardwareMap.get(DcMotor.class, "lIn");
         belt = hardwareMap.get(CRServo.class, "belt");
-        rIntake = hardwareMap.get(CRServo.class, "rIn");
-        lIntake = hardwareMap.get(CRServo.class, "lIn");
+        rOutput = hardwareMap.get(CRServo.class, "rOut");
+        lOutput = hardwareMap.get(CRServo.class, "lOut");
+        gemArm = hardwareMap.get(Servo.class, "gExt");
+        gemFlick = hardwareMap.get(Servo.class, "gF");
 
         xpower = 0;
         ypower = 0;
@@ -130,7 +135,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
             }
         } else {
             if (Math.abs(gamepad1.right_stick_x) > .1) {
-                output = -Math.pow(gamepad1.right_stick_x, 2) * gamepad1.right_stick_x / Math.abs(gamepad1.right_stick_x);
+                output = Math.pow(gamepad1.right_stick_x, 2) * gamepad1.right_stick_x / Math.abs(gamepad1.right_stick_x);
                 //if xpower is greater than .45, reduce to .45 to prevent going over 1
                 if (Math.abs(output) > .45) {
                     output = (output / Math.abs(output)) * .45;
@@ -181,40 +186,40 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
 //====================================== MANIPULATORS METHODS =================================
 
-    public void intake(boolean control, boolean control_reverse) {
+    public void output(boolean control, boolean control_reverse) {
         if (control) {
-            lIntake.setPower(-.8);
-            rIntake.setPower(.8);
+            lOutput.setPower(-.8);
+            rOutput.setPower(.8);
             belt.setPower(.8);
             telemetry.addLine("intake command recieved");
             telemetry.update();
 
         } else if (control_reverse) {
-            lIntake.setPower(.8);
-            rIntake.setPower(-.8);
+            lOutput.setPower(-.8);
+            rOutput.setPower(.8);
             belt.setPower(-.8);
         } else {
-            lIntake.setPower(0);
-            rIntake.setPower(0);
+            lOutput.setPower(0);
+            rOutput.setPower(0);
             belt.setPower(0);
         }
     }
 
-    public void output(boolean control, boolean control_reverse) {
+    public void intake(boolean control, boolean control_reverse) {
         if (control)
         {
-            rOutput.setPower(.9);
-            lOutput.setPower(.9);
+            rIntake.setPower(-.9);
+            lIntake.setPower(-.9);
         }
         else if (control_reverse)
         {
-            rOutput.setPower(-.9);
-            lOutput.setPower(-.9);
+            rIntake.setPower(.9);
+            lIntake.setPower(.9);
         }
         else
         {
-            rOutput.setPower(0);
-            lOutput.setPower(0);
+            rIntake.setPower(0);
+            lIntake.setPower(0);
         }
     }
 
@@ -298,6 +303,20 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         else
         {
             topTrack.setPower(0);
+        }
+    }
+
+    void gem_Test(boolean control)
+    {
+        if (control)
+        {
+            gemFlick.setPosition(1);
+            gemArm.setPosition(1);
+        }
+        else
+        {
+            gemFlick.setPosition(0);
+            gemArm.setPosition(0);
         }
     }
 

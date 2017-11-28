@@ -36,7 +36,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 public abstract class AutoLibrary_v2 extends LinearOpMode {
 
-    BNO055IMU gyro;
+    public BNO055IMU gyro;
     Orientation angles;
     Acceleration gravity;
     NormalizedColorSensor colorSensor;
@@ -53,11 +53,11 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public DcMotor fldrive;
     public DcMotor frdrive;
     public DcMotor topTrack;
-    public DcMotor rOutput;
-    public DcMotor lOutput;
+    public DcMotor rIntake;
+    public DcMotor lIntake;
     public CRServo belt;
-    public CRServo rIntake;
-    public CRServo lIntake;
+    public CRServo rOutput;
+    public CRServo lOutput;
 
     public Servo gemArm;
     public Servo gemFlick;
@@ -71,12 +71,13 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         brdrive = hardwareMap.get(DcMotor.class, "br");
         bldrive = hardwareMap.get(DcMotor.class, "bl");
         topTrack = hardwareMap.get(DcMotor.class, "topt");
-        rOutput = hardwareMap.get(DcMotor.class, "rOut");
-        lOutput = hardwareMap.get(DcMotor.class, "lOut");
+        rIntake = hardwareMap.get(DcMotor.class, "rIn");
+        lIntake = hardwareMap.get(DcMotor.class, "lIn");
+        rOutput = hardwareMap.get(CRServo.class, "rOut");
+        lOutput = hardwareMap.get(CRServo.class, "lOut");
         belt = hardwareMap.get(CRServo.class, "belt");
-        rIntake = hardwareMap.get(CRServo.class, "rIn");
-        lIntake = hardwareMap.get(CRServo.class, "lIn");
         gemFlick = hardwareMap.get(Servo.class, "gF");
+        gemArm = hardwareMap.get(Servo.class, "gExt");
 
 //        fldrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        frdrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -103,6 +104,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         telemetry.update();
 
         gemFlick.setPosition(.5);
+        gemArm.setPosition(0);
 
         waitForStart();
     }
@@ -167,7 +169,12 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     //recieves average enccoder value between the 4 drive motors
     public double getEncoderAvg() {
-        return ((frdrive.getCurrentPosition() + fldrive.getCurrentPosition() + brdrive.getCurrentPosition() + bldrive.getCurrentPosition()) / 4);
+        if (Math.abs(frdrive.getPower()) > 0) return frdrive.getCurrentPosition();
+        else if (Math.abs(brdrive.getPower()) > 0) return brdrive.getCurrentPosition();
+        else if (Math.abs(fldrive.getPower()) > 0) return fldrive.getCurrentPosition();
+        else if (Math.abs(bldrive.getPower()) > 0) return bldrive.getCurrentPosition();
+        else if (Math.abs(frdrive.getCurrentPosition()) >= 0) return frdrive.getCurrentPosition();
+        else return -1;
     }
 
     //Uses encoders to move a set distance in xy plane
@@ -290,11 +297,32 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         }
     }
 
+    public void move_with_y_corrections(double ypower, double targetAngle, double threshold, double intensity)
+    {
+        telemetry.addData("RorB correction", getRorBcorrection_1Axis(targetAngle, 2, 1));
+        telemetry.update();
+        frdrive.setPower(ypower * getRorBcorrection_1Axis(targetAngle, threshold, intensity));
+        brdrive.setPower(ypower * getRorBcorrection_1Axis(targetAngle, threshold, intensity));
+        fldrive.setPower(-ypower * getLorFcorrection_1Axis(targetAngle, threshold, intensity));
+        bldrive.setPower(-ypower * getLorFcorrection_1Axis(targetAngle, threshold, intensity));
+    }
+
+    public void move_with_x_corrections(double xpower, double targetAngle, double threshold, double intensity)
+    {
+        telemetry.addData("RorB correction", getRorBcorrection_1Axis(targetAngle, 2, 1));
+        telemetry.update();
+        xpower = -xpower;
+        frdrive.setPower(xpower * getLorFcorrection_1Axis(targetAngle, threshold, intensity));
+        brdrive.setPower(-xpower * getRorBcorrection_1Axis(targetAngle, threshold, intensity));
+        fldrive.setPower(xpower * getLorFcorrection_1Axis(targetAngle, threshold, intensity));
+        bldrive.setPower(-xpower * getRorBcorrection_1Axis(targetAngle, threshold, intensity));
+    }
+
     //====================== ENCODER + GYRO MOVE ======================
 
     // Combines encoder and gyro movement for a angle corrected move at a set distance
     // Never use power of .8 when using intensity of 1.
-    public void move_advanced(double ypower, double xpower, double targetAngle, double threshold, double intensity, double distance) {
+/**    public void move_advanced(double ypower, double xpower, double targetAngle, double threshold, double intensity, double distance) {
         double start = getEncoderAvg();
         while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive()) {
             frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
@@ -303,13 +331,31 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
             bldrive.setPower(-(ypower + xpower) * getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
         }
         stop_motors();
+    }*/
+
+    public void move_advanced_y(double ypower, double targetAngle, double threshold, double intensity, double distance) {
+        double start = getEncoderAvg();
+        double startTime = System.currentTimeMillis();
+        while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive() && System.currentTimeMillis() - startTime < 5000) {
+            move_with_y_corrections(ypower, targetAngle, threshold, intensity);
+        }
+        stop_motors();
+     }
+
+    public void move_advanced_x(double xpower, double targetAngle, double threshold, double intensity, double distance) {
+        double start = getEncoderAvg();
+        double startTime = System.currentTimeMillis();
+        while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive() && System.currentTimeMillis() - startTime < 5000) {
+            move_with_x_corrections(xpower, targetAngle, threshold, intensity);
+        }
+        stop_motors();
     }
 
     //====================== TIME ONLY MOVEMENT METHODS ======================
     //These methods use time to move a set distance (as opposed to encoder)
 
     //Uses time to move a set distance
-    public void move_timed(double xpower, double ypower, double duration)
+    public void move_timed(double ypower, double xpower, double duration)
     {
         double start = System.currentTimeMillis();
         while (Math.abs(System.currentTimeMillis() - start) < duration && opModeIsActive())
@@ -320,14 +366,20 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     }
 
     //Uses time to move a set distance with angle corrections
-    public void move_advanced_timed(double ypower, double xpower, double targetAngle, double threshold, double intensity, double duration)
+    public void move_advanced_timed_y(double ypower, double targetAngle, double threshold, double intensity, double duration)
     {
         double start = System.currentTimeMillis();
         while (Math.abs(System.currentTimeMillis() - start) < duration && opModeIsActive()) {
-            frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-            brdrive.setPower((ypower - xpower) * getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-            fldrive.setPower(-(ypower - xpower) * getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
-            bldrive.setPower(-(ypower + xpower) * getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
+            move_with_y_corrections(ypower, targetAngle, threshold, intensity);
+        }
+        stop_motors();
+    }
+
+    public void move_advanced_timed_x(double xpower, double targetAngle, double threshold, double intensity, double duration)
+    {
+        double start = System.currentTimeMillis();
+        while (Math.abs(System.currentTimeMillis() - start) < duration && opModeIsActive()) {
+            move_with_x_corrections(xpower, targetAngle, threshold, intensity);
         }
         stop_motors();
     }
@@ -364,7 +416,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //======================= PID + GRYO =========================
 
     //move method using both PID and gyro correction for a very precise move
-    public void move_advancedplus(double ypower, double xpower, double kporp, double kintg, double kderv, double distance, double angle, double thresholdPID, double thresholdGyro, double intensityGryo) {
+    public void move_advancedplus_y(double ypower, double kporp, double kintg, double kderv, double distance, double angle, double thresholdPID, double thresholdGyro, double intensityGryo) {
         double error = distance;
         double totalError = 0;
         double prevTime = System.currentTimeMillis();
@@ -378,10 +430,33 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
             double intg = kintg * totalError;
             double derv = kderv * (error / deltaTime);
             double PIDmod = prop + intg + derv;
-            frdrive.setPower((ypower + xpower) * PIDmod * getfrcorrection(ypower, xpower, angle, thresholdGyro, intensityGryo));
-            brdrive.setPower((ypower - xpower) * PIDmod * getbrcorrection(ypower, xpower, angle, thresholdGyro, intensityGryo));
-            fldrive.setPower(-(ypower - xpower) * PIDmod * getflcorrection(ypower, xpower, angle, thresholdGyro, intensityGryo));
-            bldrive.setPower(-(ypower + xpower) * PIDmod * getblcorrection(ypower, xpower, angle, thresholdGyro, intensityGryo));
+            frdrive.setPower(ypower * PIDmod * getRorBcorrection_1Axis(angle, thresholdGyro, intensityGryo));
+            brdrive.setPower(ypower * PIDmod * getRorBcorrection_1Axis(angle, thresholdGyro, intensityGryo));
+            fldrive.setPower(-ypower * PIDmod * getLorFcorrection_1Axis(angle, thresholdGyro, intensityGryo));
+            bldrive.setPower(-ypower * PIDmod * getLorFcorrection_1Axis(angle, thresholdGyro, intensityGryo));
+        }
+        stop_motors();
+    }
+
+    public void move_advancedplus_x(double xpower, double kporp, double kintg, double kderv, double distance, double angle, double thresholdPID, double thresholdGyro, double intensityGryo) {
+        double error = distance;
+        double totalError = 0;
+        double prevTime = System.currentTimeMillis();
+        while (Math.abs(error) > thresholdPID && opModeIsActive()) {
+            double currTime = System.currentTimeMillis();
+            double deltaTime = currTime - prevTime;
+            prevTime = currTime;
+            error = distance - getEncoderAvg();
+            totalError = error * deltaTime;
+            double prop = kporp * error;
+            double intg = kintg * totalError;
+            double derv = kderv * (error / deltaTime);
+            double PIDmod = prop + intg + derv;
+            xpower = -xpower;
+            frdrive.setPower(xpower * PIDmod * getLorFcorrection_1Axis(angle, thresholdGyro, intensityGryo));
+            brdrive.setPower(-xpower * PIDmod * getRorBcorrection_1Axis(angle, thresholdGyro, intensityGryo));
+            fldrive.setPower(xpower * PIDmod * getLorFcorrection_1Axis(angle, thresholdGyro, intensityGryo));
+            bldrive.setPower(-xpower * PIDmod * getRorBcorrection_1Axis(angle, thresholdGyro, intensityGryo));
         }
         stop_motors();
     }
@@ -418,46 +493,68 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //====================== SPECIALIZED MOVEMENT / PATH-ING ========================
 
     //Movement method (w/ gryo correction) that moves till it finds a taped line on the floor. IsRed controls whether it detects blue or red lines
-    public void move2Line(double ypower, double xpower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed) {
+    public void move2Line_y(double ypower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed) {
         double start = getEncoderAvg();
         if (isRed) {
             while (getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
-                frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                brdrive.setPower((ypower - xpower) * getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                fldrive.setPower(-(ypower - xpower) * getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                bldrive.setPower(-(ypower + xpower) * getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                move_with_y_corrections(ypower, targetAngle, threshold, intensity);
             }
         } else {
             while (getFloorBlue() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
-                frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                brdrive.setPower((ypower - xpower) * getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                fldrive.setPower(-(ypower - xpower) * getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                bldrive.setPower(-(ypower + xpower) * getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                move_with_y_corrections(ypower, targetAngle, threshold, intensity);
             }
-
         }
         stop_motors();
     }
 
     //above - but with power oscillating from on to 0. Motion makes color sensors inaccurate, so staggering motion may improve accuracy
-    public void move2Line_stagger(double ypower, double xpower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed) {
+    public void move2Line_stagger_y(double ypower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed) {
         double start = getEncoderAvg();
         if (isRed) {
             while (getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
-                frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                brdrive.setPower((ypower - xpower) * getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                fldrive.setPower(-(ypower - xpower) * getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                bldrive.setPower(-(ypower + xpower) * getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                move_with_y_corrections(ypower, targetAngle, threshold, intensity);
                 sleep(100);
                 stop_motors();
                 sleep(50);
             }
         } else {
             while (getFloorBlue() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
-                frdrive.setPower((ypower + xpower) * getfrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                brdrive.setPower((ypower - xpower) * getbrcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                fldrive.setPower(-(ypower - xpower) * getflcorrection(ypower, xpower, targetAngle, threshold, intensity));
-                bldrive.setPower(-(ypower + xpower) * getblcorrection(ypower, xpower, targetAngle, threshold, intensity));
+                move_with_y_corrections(ypower, targetAngle, threshold, intensity);
+                sleep(100);
+                stop_motors();
+                sleep(50);
+            }
+        }
+        stop_motors();
+    }
+
+    public void move2Line_x(double xpower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed) {
+        double start = getEncoderAvg();
+        if (isRed) {
+            while (getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
+                move_with_x_corrections(xpower, targetAngle, threshold, intensity);
+            }
+        } else {
+            while (getFloorBlue() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
+                move_with_x_corrections(xpower, targetAngle, threshold, intensity);
+            }
+        }
+        stop_motors();
+    }
+
+    //above - but with power oscillating from on to 0. Motion makes color sensors inaccurate, so staggering motion may improve accuracy
+    public void move2Line_stagger_x(double xpower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed) {
+        double start = getEncoderAvg();
+        if (isRed) {
+            while (getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
+                move_with_x_corrections(xpower, targetAngle, threshold, intensity);
+                sleep(100);
+                stop_motors();
+                sleep(50);
+            }
+        } else {
+            while (getFloorBlue() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
+                move_with_x_corrections(xpower, targetAngle, threshold, intensity);
                 sleep(100);
                 stop_motors();
                 sleep(50);
@@ -471,7 +568,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //starts intake motors. will run until stopped
     public void startIntake(double power) {
         lIntake.setPower(-power);
-        rIntake.setPower(power);
+        rIntake.setPower(-power);
         belt.setPower(power);
     }
 
@@ -485,6 +582,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     {
         lOutput.setPower(-power);
         rOutput.setPower(power);
+        belt.setPower(power);
     }
 
     //stops output motors
@@ -528,7 +626,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //Uses gem Flick servo and color sensor to detect the the jewel and knock off the correct one
     //returns true if successful
     public boolean getGem(double extension, int threshold, boolean isRed) {
-//        gemArm.setPosition(extension);
+        gemArm.setPosition(1);
         telemetry.addLine("starting getGEM");
         telemetry.update();
         sleep(100);
@@ -537,23 +635,23 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
             telemetry.update();
             if (isRed) {gemFlick.setPosition(1);}
             else {gemFlick.setPosition(0);}
-            sleep(500);
-            return true;
         }
         else if (getRed() > getBlue() && getRed() > threshold) {
             telemetry.addLine("red detected");
             telemetry.update();
             if(isRed) {gemFlick.setPosition(0);}
             else {gemFlick.setPosition(1);}
-            sleep(500);
-            return true;
         }
         else {
             telemetry.addLine("color sensing failed");
             telemetry.update();
             sleep(100);
+            gemArm.setPosition(0);
             return false;
         }
+        sleep(500);
+        gemArm.setPosition(0);
+        return true;
     }
 
     //Above, but makes multiple attempts

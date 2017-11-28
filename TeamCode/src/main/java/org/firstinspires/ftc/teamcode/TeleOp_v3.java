@@ -19,12 +19,14 @@ public class TeleOp_v3 extends TeleOpLibrary_v2
     private double drivePowerMod;
     private boolean tank;
     private boolean hold;
+    boolean gem;
 
     @Override
     public void init() {
         drivePowerMod = .8;
         tank = false;
         hold = false;
+        gem = false;
         initialize();
     }
 
@@ -62,8 +64,10 @@ public class TeleOp_v3 extends TeleOpLibrary_v2
         topTrackManual(gamepad2.left_stick_y, hold);
         intake(gamepad2.right_bumper, gamepad2.left_bumper);
         output(gamepad2.right_trigger > .1, gamepad2.left_trigger > .1 );
+        gem_Test(gem);
         hold = toggle(hold, gamepad2.b);
         tank = toggle(tank, gamepad1.b);
+        gem = toggle(gem, gamepad2.a);
         drivePowerMod = toggleDouble(drivePowerMod, gamepad1.x, .8, .2);
 
     }
