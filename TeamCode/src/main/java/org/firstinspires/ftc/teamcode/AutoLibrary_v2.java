@@ -288,11 +288,11 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         {
             if (angle_delta(getAngle(), targetAngle) > 0)
             {
-                turn_basic(power);
+                turn_basic(-power);
             }
             else
             {
-                turn_basic(-power);
+                turn_basic(power);
             }
         }
     }
