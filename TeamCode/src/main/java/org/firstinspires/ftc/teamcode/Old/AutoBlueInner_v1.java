@@ -10,7 +10,7 @@ Controls robot with methods from AutoLibrary class in the
 autonomous period of FTC's Relic Recovery competition.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Old;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
@@ -30,6 +30,7 @@ public class AutoBlueInner_v1 extends AutoLibrary_v1{
 
     @Override
     public void runOpMode() {
+
 
         initialize();
         waitForStart();
