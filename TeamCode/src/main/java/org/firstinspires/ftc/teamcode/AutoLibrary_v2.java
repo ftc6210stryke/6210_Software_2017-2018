@@ -180,7 +180,8 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //Uses encoders to move a set distance in xy plane
     public void move_encoder(double ypower, double xpower, double distance) {
         double start = getEncoderAvg();
-        while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive()) {
+        double startTime = System.currentTimeMillis();
+        while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive() && System.currentTimeMillis() - startTime < 5000 + distance*2) {
             move_biaxis_basic(ypower, xpower);
         }
         stop_motors();

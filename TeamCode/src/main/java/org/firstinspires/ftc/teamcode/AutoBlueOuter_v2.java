@@ -32,11 +32,11 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
         telemetry.update();
         sleep(1000);
         //targetColumn= getSymbol_multitry(3, angle);
-        move_encoder(0, .3, 1300);
+        move_encoder(0, .3, 1310);
         telemetry.addLine("Move : ToLine : Complete");
         telemetry.update();
-        sleep(1000);
-        targetColumn = RelicRecoveryVuMark.UNKNOWN;
+        sleep(2000);
+        targetColumn = RelicRecoveryVuMark.CENTER;
         if (targetColumn == RelicRecoveryVuMark.LEFT)
         {
             telemetry.addLine("Move : ToLeft : Complete");
@@ -44,22 +44,21 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
         }
         else if (targetColumn == RelicRecoveryVuMark.CENTER)
         {
-            move_encoder(0, .25, 500);
+            move_encoder(0, .25, 560);
             telemetry.addLine("Move : ToCenter : Complete");
             telemetry.update();
         }
         else
         {
-            move_encoder(0, .4, 1000);
+            move_encoder(0, .4, 1030);
             telemetry.addLine("Move : ToRight or Unknown : Complete");
             telemetry.update();
         }
         sleep(1000);
-        move_encoder(.25, 0, 200);
+        move_encoder(.25, 0, 250);
         telemetry.addLine("Move : ToGlyphBox : Complete");
         telemetry.update();
-        startOutput(1);
+        moveTopTrack(.6, 20);
         sleep(2000);
-        stopOutput();
     }
 }

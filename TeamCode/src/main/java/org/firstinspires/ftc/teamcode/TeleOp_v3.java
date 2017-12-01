@@ -65,7 +65,7 @@ public class TeleOp_v3 extends TeleOpLibrary_v2
         intake(gamepad2.right_bumper, gamepad2.left_bumper);
         output(gamepad2.right_trigger > .1, gamepad2.left_trigger > .1 );
         gem_Test(gem);
-        hold = toggle(hold, gamepad2.b);
+        hold = toggle(hold, gamepad2.y);
         tank = toggle(tank, gamepad1.b);
         gem = toggle(gem, gamepad2.a);
         drivePowerMod = toggleDouble(drivePowerMod, gamepad1.x, .8, .2);
