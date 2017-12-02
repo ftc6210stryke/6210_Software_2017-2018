@@ -59,7 +59,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public CRServo rOutput;
     public CRServo lOutput;
 
-    public Servo gemArm;
+    public CRServo gemArm;
     public Servo gemFlick;
 
     boolean hold = false;
@@ -77,7 +77,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         lOutput = hardwareMap.get(CRServo.class, "lOut");
         belt = hardwareMap.get(CRServo.class, "belt");
         gemFlick = hardwareMap.get(Servo.class, "gF");
-        gemArm = hardwareMap.get(Servo.class, "gExt");
+        gemArm = hardwareMap.get(CRServo.class, "gExt");
 
 //        fldrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        frdrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -89,7 +89,6 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 //        vision_init();
 
         gemSensor = hardwareMap.get(ColorSensor.class, "csGem");
-//        gemSensor = hardwareMap.get(NormalizedColorSensor.class, "gemSensor");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -104,7 +103,6 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         telemetry.update();
 
         gemFlick.setPosition(.5);
-        gemArm.setPosition(0);
 
         waitForStart();
     }
@@ -627,7 +625,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //Uses gem Flick servo and color sensor to detect the the jewel and knock off the correct one
     //returns true if successful
     public boolean getGem(double extension, int threshold, boolean isRed) {
-        gemArm.setPosition(1);
+        gemArm.setPower(.8);
         telemetry.addLine("starting getGEM");
         telemetry.update();
         sleep(100);
@@ -647,11 +645,11 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
             telemetry.addLine("color sensing failed");
             telemetry.update();
             sleep(100);
-            gemArm.setPosition(0);
+            gemArm.setPower(-.8);
             return false;
         }
         sleep(500);
-        gemArm.setPosition(0);
+        gemArm.setPower(-.8);
         return true;
     }
 

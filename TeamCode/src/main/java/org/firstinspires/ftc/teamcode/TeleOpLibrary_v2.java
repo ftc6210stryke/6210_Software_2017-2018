@@ -41,7 +41,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public double lturnpower;
     public double toggleguard;
     public int outputLevel;
-    public Servo gemArm;
+    public CRServo gemArm;
     public Servo gemFlick;
 
     public void initialize() {
@@ -55,7 +55,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         belt = hardwareMap.get(CRServo.class, "belt");
         rOutput = hardwareMap.get(CRServo.class, "rOut");
         lOutput = hardwareMap.get(CRServo.class, "lOut");
-        gemArm = hardwareMap.get(Servo.class, "gExt");
+        gemArm = hardwareMap.get(CRServo.class, "gExt");
         gemFlick = hardwareMap.get(Servo.class, "gF");
 
         xpower = 0;
@@ -311,12 +311,12 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         if (control)
         {
             gemFlick.setPosition(1);
-            gemArm.setPosition(1);
+            gemArm.setPower(.8);
         }
         else
         {
             gemFlick.setPosition(0);
-            gemArm.setPosition(0);
+            gemArm.setPower(0);
         }
     }
 
