@@ -36,7 +36,7 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
         telemetry.addLine("Move : ToLine : Complete");
         telemetry.update();
         sleep(2000);
-        targetColumn = RelicRecoveryVuMark.CENTER;
+        targetColumn = RelicRecoveryVuMark.LEFT;
         if (targetColumn == RelicRecoveryVuMark.LEFT)
         {
             telemetry.addLine("Move : ToLeft : Complete");
@@ -58,7 +58,7 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
         move_encoder(.25, 0, 250);
         telemetry.addLine("Move : ToGlyphBox : Complete");
         telemetry.update();
-        moveTopTrack(.6, 20);
+        moveTopTrack(.6, 10);
         sleep(2000);
     }
 }
