@@ -32,7 +32,7 @@ public class Auto_GemExt_Test extends AutoLibrary_v2 {
         double timeStart = System.currentTimeMillis();
         while (gamepad1.a && opModeIsActive())
         {
-            gemArm.setPower(.7);
+            gemArm.setPower(-.7);
             telemetry.addData("Time Elapsed :", System.currentTimeMillis() - timeStart);
             telemetry.update();
         }
@@ -41,7 +41,7 @@ public class Auto_GemExt_Test extends AutoLibrary_v2 {
         timeStart = System.currentTimeMillis();
         while(gamepad1.b && opModeIsActive())
         {
-            gemArm.setPower(-.7);
+            gemArm.setPower(.7);
             telemetry.addData("Time Elapsed :", System.currentTimeMillis() - timeStart);
             telemetry.update();
         }

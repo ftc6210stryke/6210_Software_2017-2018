@@ -188,8 +188,8 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
     public void output(boolean control, boolean control_reverse) {
         if (control) {
-            lOutput.setPower(-.8);
-            rOutput.setPower(.8);
+            lOutput.setPower(.8);
+            rOutput.setPower(-.8);
             belt.setPower(.8);
             telemetry.addLine("intake command recieved");
             telemetry.update();
@@ -310,13 +310,11 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     {
         if (control)
         {
-            gemFlick.setPosition(1);
-            gemArm.setPower(.8);
+            gemFlick.setPosition(.85);
         }
         else
         {
-            gemFlick.setPosition(0);
-            gemArm.setPower(0);
+            gemFlick.setPosition(.15);
         }
     }
 

@@ -27,7 +27,7 @@ public class AutoBlueInner_v2 extends AutoLibrary_v2{
 
         initialize();
         double angle = getAngle();
-        getGemMultitry(1, 5, false, 3, angle);
+        getGemMultitry(5, false, 3, angle);
         move_encoder(0, -.25, 100);
         targetColumn= getSymbol_multitry(3, angle);
         move_encoder(0, .25, 400);

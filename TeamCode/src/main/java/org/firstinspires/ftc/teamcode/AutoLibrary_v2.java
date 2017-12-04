@@ -62,7 +62,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public CRServo gemArm;
     public Servo gemFlick;
 
-    boolean hold = false;
+    boolean hold;
 
     //method initialize's the robot
     public void initialize() throws InterruptedException {
@@ -86,7 +86,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 //        brdrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        bldrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-//        vision_init();
+        vision_init();
 
         gemSensor = hardwareMap.get(ColorSensor.class, "csGem");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -103,6 +103,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         telemetry.update();
 
         gemFlick.setPosition(.5);
+        hold = false;
 
         waitForStart();
     }
@@ -179,7 +180,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public void move_encoder(double ypower, double xpower, double distance) {
         double start = getEncoderAvg();
         double startTime = System.currentTimeMillis();
-        while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive() && System.currentTimeMillis() - startTime < 5000 + distance*2) {
+        while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive() && System.currentTimeMillis() - startTime < 4000 + distance*2) {
             move_biaxis_basic(ypower, xpower);
         }
         stop_motors();
@@ -590,7 +591,8 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //Moves top track a set distance based on encoder values
     public void moveTopTrack(double power, double distance) {
         double start = topTrack.getCurrentPosition();
-        while (Math.abs(topTrack.getCurrentPosition() - start) < distance && opModeIsActive()) {
+        double timeStart = System.currentTimeMillis();
+        while (Math.abs(topTrack.getCurrentPosition() - start) < distance && (System.currentTimeMillis() - timeStart) < 2000 && opModeIsActive()) {
             topTrack.setPower(-power);
         }
         if (hold)
@@ -624,40 +626,37 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     //Uses gem Flick servo and color sensor to detect the the jewel and knock off the correct one
     //returns true if successful
-    public boolean getGem(double extension, int threshold, boolean isRed) {
-        gemArm.setPower(.8);
+    public boolean getGem(int threshold, boolean isRed) {
         telemetry.addLine("starting getGEM");
         telemetry.update();
         sleep(100);
         if (getBlue() > getRed() && getBlue() > threshold) {
             telemetry.addLine("blue detected");
             telemetry.update();
-            if (isRed) {gemFlick.setPosition(1);}
-            else {gemFlick.setPosition(0);}
+            if (isRed) {gemFlick.setPosition(0);}
+            else {gemFlick.setPosition(1);}
         }
         else if (getRed() > getBlue() && getRed() > threshold) {
             telemetry.addLine("red detected");
             telemetry.update();
-            if(isRed) {gemFlick.setPosition(0);}
-            else {gemFlick.setPosition(1);}
+            if(isRed) {gemFlick.setPosition(1);}
+            else {gemFlick.setPosition(0);}
         }
         else {
             telemetry.addLine("color sensing failed");
             telemetry.update();
             sleep(100);
-            gemArm.setPower(-.8);
             return false;
         }
         sleep(500);
-        gemArm.setPower(-.8);
         return true;
     }
 
     //Above, but makes multiple attempts
-    public void getGemMultitry(double extension, int threshold, boolean isRed, int tries, double angle)
+    public void getGemMultitry(int threshold, boolean isRed, int tries, double angle)
     {
         for (int i = 1; i < tries; i++) {
-            if (!getGem(extension, threshold, isRed)) {
+            if (!getGem(threshold, isRed)) {
                 turn_gyro(.2, angle, 2);
             }
         }
@@ -667,6 +666,18 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public void resetGemArm()
     {
         gemFlick.setPosition(.5);
+    }
+
+    public void extendGemArm(boolean isForward)
+    {
+        int direction = -1;
+        if (!isForward) direction = 1;
+        double timeStart = System.currentTimeMillis();
+        while (System.currentTimeMillis() - timeStart < 3400 && opModeIsActive()) //3300
+        {
+            gemArm.setPower(.7 * direction);
+        }
+        gemArm.setPower(0);
     }
 
     public void relic() {

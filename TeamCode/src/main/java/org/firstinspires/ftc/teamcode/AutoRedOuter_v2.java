@@ -16,8 +16,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-@Autonomous (name="AutoBlueOuter_v2.5", group="Auto")
-public class AutoBlueOuter_v2 extends AutoLibrary_v2{
+@Autonomous (name="AutoRedOuter_v2.5", group="Auto")
+public class AutoRedOuter_v2 extends AutoLibrary_v2{
 
     private RelicRecoveryVuMark targetColumn;
 
@@ -28,7 +28,7 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
         double angle = getAngle();
         extendGemArm(true);
         sleep(500);
-        getGem(10, false);
+        getGem(10, true);
         sleep(500);
         extendGemArm(false);
         sleep(500);
@@ -36,31 +36,31 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
         sleep(500);
         move_encoder(-.2, 0, 25);
         sleep(500);
-        move_encoder(0, .25, 500);
+        move_encoder(0, -.25, 500);
         telemetry.addLine("Move : ToSymbol : Complete");
         telemetry.update();
         sleep(1000);
         targetColumn = getSymbol();
         sleep(1000);
-        move_encoder(0, .3, 1270); //1310
+        move_encoder(0, -.3, 1270); //1310
         telemetry.addLine("Move : ToLine : Complete");
         telemetry.update();
         sleep(1000);
-        if (targetColumn == RelicRecoveryVuMark.RIGHT)
+        if (targetColumn == RelicRecoveryVuMark.LEFT)
         {
-            move_encoder(0, .4, 1000); //1030
-            telemetry.addLine("Move : ToRight : Complete");
+            move_encoder(0, -.4, 1000); //1030
+            telemetry.addLine("Move : ToLeft : Complete");
             telemetry.update();
         }
         else if (targetColumn == RelicRecoveryVuMark.CENTER)
         {
-            move_encoder(0, .25, 530); //560
+            move_encoder(0, -.25, 530); //560
             telemetry.addLine("Move : ToCenter : Complete");
             telemetry.update();
         }
         else
         {
-            telemetry.addLine("Move : ToLeft or Unknown : Complete");
+            telemetry.addLine("Move : ToRight or Unknown : Complete");
             telemetry.update();
         }
         sleep(1000);
