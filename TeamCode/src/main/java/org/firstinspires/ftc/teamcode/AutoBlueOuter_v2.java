@@ -34,13 +34,13 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
         sleep(500);
         gemFlick.setPosition(.15);
         sleep(500);
-        move_encoder(-.2, 0, 25);
+        move_encoder(-.25, 0, 35);
         sleep(500);
         move_encoder(0, .25, 500);
         telemetry.addLine("Move : ToSymbol : Complete");
         telemetry.update();
         sleep(1000);
-        targetColumn = getSymbol();
+        targetColumn = RelicRecoveryVuMark.UNKNOWN;
         sleep(1000);
         move_encoder(0, .3, 1270); //1310
         telemetry.addLine("Move : ToLine : Complete");
@@ -64,12 +64,20 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
             telemetry.update();
         }
         sleep(1000);
-        move_encoder(.25, 0, 250);
+        move_encoder(.25, 0, 300); //250
         telemetry.addLine("Move : ToGlyphBox : Complete");
         telemetry.update();
-        moveTopTrack(.6, 8);
+        startOutput(.7);
         sleep(2000);
-        move_encoder(.2, 0, 300);
-        sleep(2000);
+        stopOutput();
+        sleep(100);
+//        moveTopTrack(.6, 15);
+//        sleep(2000);
+//        move_encoder(.2, 0, 300);
+//        sleep(1000);
+//        moveTopTrack(-.6, 15);
+//        sleep(500);
+        move_encoder(-.25, 0, 400);
+        sleep(100);
     }
 }

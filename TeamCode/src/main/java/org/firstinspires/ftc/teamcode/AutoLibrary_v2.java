@@ -86,7 +86,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 //        brdrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        bldrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        vision_init();
+//        vision_init();
 
         gemSensor = hardwareMap.get(ColorSensor.class, "csGem");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
@@ -592,7 +592,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public void moveTopTrack(double power, double distance) {
         double start = topTrack.getCurrentPosition();
         double timeStart = System.currentTimeMillis();
-        while (Math.abs(topTrack.getCurrentPosition() - start) < distance && (System.currentTimeMillis() - timeStart) < 2000 && opModeIsActive()) {
+        while (Math.abs(topTrack.getCurrentPosition() - start) < distance && (System.currentTimeMillis() - timeStart) < 3000 && opModeIsActive()) {
             topTrack.setPower(-power);
         }
         if (hold)

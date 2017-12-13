@@ -13,10 +13,12 @@ autonomous period of FTC's Relic Recovery competition.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
+@Disabled
 @Autonomous (name="AutoBlueInner_v2.0", group="Auto")
 public class AutoBlueInner_v2 extends AutoLibrary_v2{
 
@@ -27,30 +29,41 @@ public class AutoBlueInner_v2 extends AutoLibrary_v2{
 
         initialize();
         double angle = getAngle();
-        getGemMultitry(5, false, 3, angle);
-        move_encoder(0, -.25, 100);
-        targetColumn= getSymbol_multitry(3, angle);
-        move_encoder(0, .25, 400);
-        angle = angle - 90;
-        turn_gyro(.25, angle, 3);
-        move_encoder(0, .25, 300);
-        if (targetColumn == RelicRecoveryVuMark.LEFT)
+        extendGemArm(true);
+        sleep(500);
+        getGem(10, false);
+        sleep(500);
+        extendGemArm(false);
+        sleep(500);
+        gemFlick.setPosition(.15);
+        sleep(500);
+        move_encoder(0, .25, 1000);
+        turn_gyro(.25, -90, 2);
+        angle -= 90;
+        move_encoder(0, .25, 1000);
+        if (targetColumn == RelicRecoveryVuMark.RIGHT)
         {
-            move_encoder(0, .25, 100);
+            move_encoder(0, .4, 1000); //1030
+            telemetry.addLine("Move : ToRight : Complete");
+            telemetry.update();
         }
         else if (targetColumn == RelicRecoveryVuMark.CENTER)
         {
-            move_encoder(0, .25, 200);
+            move_encoder(0, .25, 530); //560
+            telemetry.addLine("Move : ToCenter : Complete");
+            telemetry.update();
         }
         else
         {
-            move_encoder(0, .25, 300);
+            telemetry.addLine("Move : ToLeft or Unknown : Complete");
+            telemetry.update();
         }
-        turn_gyro(.3, angle, 3);
-        move_encoder(-.25, 0, 100);
-        moveTopTrack(-.5, 100);
-        startOutput(1);
-        sleep(500);
+        move_encoder(.25, 0, 300);
+        startOutput(.7);
+        sleep(2000);
         stopOutput();
+        sleep(100);
+        move_encoder(-.25, 0, 400);
+        sleep(100);
     }
 }

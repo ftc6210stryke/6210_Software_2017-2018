@@ -16,8 +16,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-@Autonomous (name="AutoRedOuter_v2.5", group="Auto")
-public class AutoRedOuter_v2 extends AutoLibrary_v2{
+@Autonomous (name="AutoRedOuter_NOGEM", group="Auto")
+public class AutoRedOuter_NOGEM_v1 extends AutoLibrary_v2{
 
     private RelicRecoveryVuMark targetColumn;
 
@@ -25,15 +25,6 @@ public class AutoRedOuter_v2 extends AutoLibrary_v2{
     public void runOpMode() throws InterruptedException {
 
         initialize();
-        double angle = getAngle();
-        extendGemArm(true);
-        sleep(500);
-        getGem(10, true);
-        sleep(500);
-        extendGemArm(false);
-        sleep(500);
-        gemFlick.setPosition(.15);
-        sleep(500);
         move_encoder(-.25, 0, 35);
         sleep(500);
         move_encoder(0, -.25, 500);

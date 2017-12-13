@@ -126,7 +126,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         double output = 0;
         if (isY) {
             if (Math.abs(gamepad1.right_stick_y) > .1) {
-                output = -Math.pow(gamepad1.right_stick_y, 2) * gamepad1.right_stick_y / Math.abs(gamepad1.right_stick_y);
+                output = Math.pow(gamepad1.right_stick_y, 2) * gamepad1.right_stick_y / Math.abs(gamepad1.right_stick_y);
                 //if output is greater than .45, reduce to .45 to prevent going over 1
                 if (Math.abs(output) > .45) {
                     output = (output / Math.abs(output)) * .45;
@@ -135,7 +135,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
             }
         } else {
             if (Math.abs(gamepad1.right_stick_x) > .1) {
-                output = Math.pow(gamepad1.right_stick_x, 2) * gamepad1.right_stick_x / Math.abs(gamepad1.right_stick_x);
+                output = -Math.pow(gamepad1.right_stick_x, 2) * gamepad1.right_stick_x / Math.abs(gamepad1.right_stick_x);
                 //if xpower is greater than .45, reduce to .45 to prevent going over 1
                 if (Math.abs(output) > .45) {
                     output = (output / Math.abs(output)) * .45;
@@ -298,7 +298,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         }
         else if (hold)
         {
-                topTrack.setPower(.4);
+            topTrack.setPower(.45);
         }
         else
         {

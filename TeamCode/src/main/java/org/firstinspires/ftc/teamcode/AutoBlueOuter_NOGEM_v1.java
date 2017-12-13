@@ -16,8 +16,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-@Autonomous (name="AutoRedOuter_v2.5", group="Auto")
-public class AutoRedOuter_v2 extends AutoLibrary_v2{
+@Autonomous (name="AutoBlueOuter_NO_GEM", group="Auto")
+public class AutoBlueOuter_NOGEM_v1 extends AutoLibrary_v2{
 
     private RelicRecoveryVuMark targetColumn;
 
@@ -25,42 +25,33 @@ public class AutoRedOuter_v2 extends AutoLibrary_v2{
     public void runOpMode() throws InterruptedException {
 
         initialize();
-        double angle = getAngle();
-        extendGemArm(true);
-        sleep(500);
-        getGem(10, true);
-        sleep(500);
-        extendGemArm(false);
-        sleep(500);
-        gemFlick.setPosition(.15);
-        sleep(500);
         move_encoder(-.25, 0, 35);
         sleep(500);
-        move_encoder(0, -.25, 500);
+        move_encoder(0, .25, 500);
         telemetry.addLine("Move : ToSymbol : Complete");
         telemetry.update();
         sleep(1000);
         targetColumn = RelicRecoveryVuMark.UNKNOWN;
         sleep(1000);
-        move_encoder(0, -.3, 1400); //1270
+        move_encoder(0, .3, 1270); //1310
         telemetry.addLine("Move : ToLine : Complete");
         telemetry.update();
         sleep(1000);
-        if (targetColumn == RelicRecoveryVuMark.LEFT)
+        if (targetColumn == RelicRecoveryVuMark.RIGHT)
         {
-            move_encoder(0, -.4, 1000); //1030
-            telemetry.addLine("Move : ToLeft : Complete");
+            move_encoder(0, .4, 1000); //1030
+            telemetry.addLine("Move : ToRight : Complete");
             telemetry.update();
         }
         else if (targetColumn == RelicRecoveryVuMark.CENTER)
         {
-            move_encoder(0, -.25, 530); //560
+            move_encoder(0, .25, 530); //560
             telemetry.addLine("Move : ToCenter : Complete");
             telemetry.update();
         }
         else
         {
-            telemetry.addLine("Move : ToRight or Unknown : Complete");
+            telemetry.addLine("Move : ToLeft or Unknown : Complete");
             telemetry.update();
         }
         sleep(1000);
@@ -70,7 +61,7 @@ public class AutoRedOuter_v2 extends AutoLibrary_v2{
         moveTopTrack(.6, 15);
         sleep(2000);
         move_encoder(.2, 0, 300);
-        sleep(2000);
+        sleep(1000);
         moveTopTrack(-.6, 15);
         sleep(500);
         move_encoder(-.25, 0, 400);
