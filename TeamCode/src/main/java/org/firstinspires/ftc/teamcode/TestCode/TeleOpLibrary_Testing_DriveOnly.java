@@ -9,7 +9,7 @@ AutoMain_v1
 Holds methods to be used for Autonomous programs in FTC's Relic Recovery Competition.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.TestCode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
@@ -24,45 +24,40 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 
-public abstract class TeleOpLibrary_v2 extends OpMode {
+public abstract class TeleOpLibrary_Testing_DriveOnly extends OpMode {
     public DcMotor bldrive;
     public DcMotor brdrive;
     public DcMotor fldrive;
     public DcMotor frdrive;
-    public DcMotor topTrack;
-    public DcMotor rIntake;
-    public DcMotor lIntake;
-    public DcMotor RelicSlide;
-    public CRServo belt;
-    public CRServo rOutput;
-    public CRServo lOutput;
+
+    public BNO055IMU gyro;
+    Orientation angles;
+    Acceleration gravity;
+
     public double ypower;
     public double xpower;
     public double rturnpower;
     public double lturnpower;
     public double toggleguard;
-    public int outputLevel;
-    public CRServo gemArm;
-    public Servo gemFlick;
-    public Servo RelicArm;
-    public Servo RelicClaw;
 
     public void initialize() {
         frdrive = hardwareMap.get(DcMotor.class, "fr");
         fldrive = hardwareMap.get(DcMotor.class, "fl");
         brdrive = hardwareMap.get(DcMotor.class, "br");
         bldrive = hardwareMap.get(DcMotor.class, "bl");
-        topTrack = hardwareMap.get(DcMotor.class, "topt");
-        rIntake = hardwareMap.get(DcMotor.class, "rIn");
-        lIntake = hardwareMap.get(DcMotor.class, "lIn");
-        RelicSlide = hardwareMap.get(DcMotor.class, "ReS");
-        belt = hardwareMap.get(CRServo.class, "belt");
-        rOutput = hardwareMap.get(CRServo.class, "rOut");
-        lOutput = hardwareMap.get(CRServo.class, "lOut");
-        gemArm = hardwareMap.get(CRServo.class, "gExt");
-        gemFlick = hardwareMap.get(Servo.class, "gF");
-        RelicArm = hardwareMap.get(Servo.class, "ReA");
-        RelicClaw = hardwareMap.get(Servo.class, "ReC");
+
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
+        parameters.loggingEnabled = true;
+        parameters.loggingTag = "GRYO";
+        parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        gyro = hardwareMap.get(BNO055IMU.class, "gyro");
+        gyro.initialize(parameters);
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
 
         xpower = 0;
         ypower = 0;
@@ -190,163 +185,6 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     }
 
 
-//====================================== MANIPULATORS METHODS =================================
-
-    public void output(boolean control, boolean control_reverse) {
-        if (control) {
-            lOutput.setPower(.8);
-            rOutput.setPower(-.8);
-            belt.setPower(.8);
-            telemetry.addLine("intake command recieved");
-            telemetry.update();
-
-        } else if (control_reverse) {
-            lOutput.setPower(-.8);
-            rOutput.setPower(.8);
-            belt.setPower(-.8);
-        } else {
-            lOutput.setPower(0);
-            rOutput.setPower(0);
-            belt.setPower(0);
-        }
-    }
-
-    public void intake(boolean control, boolean control_reverse) {
-        if (control)
-        {
-            rIntake.setPower(-.9);
-            lIntake.setPower(-.9);
-        }
-        else if (control_reverse)
-        {
-            rIntake.setPower(.9);
-            lIntake.setPower(.9);
-        }
-        else
-        {
-            rIntake.setPower(0);
-            lIntake.setPower(0);
-        }
-    }
-
-
-    public void relic(double slidePowerMod, double slide_control, boolean arm_control, boolean claw_control)
-    {
-        if (Math.abs(slide_control) > 0)
-        {
-            RelicSlide.setPower(slide_control * slidePowerMod);
-        }
-        else
-        {
-            RelicSlide.setPower(0);
-        }
-        if (arm_control)
-        {
-            RelicArm.setPosition(1);
-        }
-        else
-        {
-            RelicArm.setPosition(0);
-        }
-        if (claw_control)
-        {
-            RelicClaw.setPosition(1);
-        }
-        else
-        {
-            RelicClaw.setPosition(0);
-        }
-    }
-
-    public void TopTrackSet(double power, boolean control0, boolean control1, boolean control2, boolean control3) {
-        telemetry.addData("track encoder", topTrack.getCurrentPosition());
-        telemetry.addData("track level", outputLevel);
-        telemetry.update();
-        double start = topTrack.getCurrentPosition();
-        if (control0 && outputLevel != 0) {
-            while (Math.abs(topTrack.getCurrentPosition() - start) < (50 * outputLevel)) {
-                topTrack.setPower(-power / 5);
-            }
-            outputLevel = 0;
-        } else if (control1 && outputLevel != 1) {
-            if (outputLevel == 0) {
-                while (Math.abs(topTrack.getCurrentPosition() - start) < 150 * (1 - outputLevel)) {
-                    topTrack.setPower(power);
-                }
-            } else {
-                while (Math.abs(topTrack.getCurrentPosition() - start) < 150 * (outputLevel - 1)) {
-                    topTrack.setPower(-power / 5);
-                }
-            }
-            outputLevel = 1;
-        } else if (control2 && outputLevel != 2) {
-            if (outputLevel == 0 || outputLevel == 1) {
-                while (Math.abs(topTrack.getCurrentPosition() - start) < 150 * (2 - outputLevel)) {
-                    topTrack.setPower(power);
-                }
-            } else {
-                while (Math.abs(topTrack.getCurrentPosition() - start) < 150 * (outputLevel - 2)) {
-                    topTrack.setPower(-power / 5);
-                }
-            }
-            outputLevel = 2;
-        } else if (control3 && outputLevel != 3) {
-            while (Math.abs(topTrack.getCurrentPosition() - start) < 150 * (3 - outputLevel)) {
-                topTrack.setPower(power);
-            }
-            outputLevel = 3;
-        } else if (gamepad2.dpad_up) {
-            topTrack.setPower(power);
-        } else if (gamepad2.dpad_down) {
-            topTrack.setPower(-power / 5);
-        } else if (gamepad2.dpad_left) {
-            topTrack.setPower(.25);
-        } else {
-            topTrack.setPower(0);
-        }
-        telemetry.addData("track encoder", topTrack.getCurrentPosition());
-        telemetry.addData("track level", outputLevel);
-        telemetry.update();
-    }
-
-    public void topTrackManual (double control, boolean hold)
-    {
-        if (control < -.2)
-        {
-            control = control/2;
-            topTrack.setPower(control);
-        }
-        else if (control > .2)
-        {
-            control = control*1.5;
-            if (control > 1)
-            {
-                control = 1;
-            }
-            topTrack.setPower(control);
-        }
-        else if (hold)
-        {
-            topTrack.setPower(.45);
-        }
-        else
-        {
-            topTrack.setPower(0);
-        }
-    }
-
-    void gem_Test(boolean control)
-    {
-        if (control)
-        {
-            gemFlick.setPosition(.85);
-        }
-        else
-        {
-            gemFlick.setPosition(.15);
-        }
-    }
-
 // ===================================== UTILITY METHODS ==================================
 
     public boolean toggle(boolean target, boolean control) {
@@ -372,5 +210,22 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         }
         return target;
     }
-}
 
+// ===================================== GRYO METHODS ==================================
+
+    public double angle_delta(double currentAngle, double targetAngle) {
+        double delta = targetAngle - currentAngle;
+        if (delta < -180) {
+            delta += 360;
+        } else if (delta > 180) {
+            delta -= 360;
+        }
+        return delta;
+    }
+
+    public double getAngle()
+    {
+        angles   = gyro.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        return angles.firstAngle;
+    }
+}

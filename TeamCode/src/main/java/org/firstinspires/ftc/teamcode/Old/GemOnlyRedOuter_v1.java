@@ -35,7 +35,7 @@ public class GemOnlyRedOuter_v1 extends AutoLibrary_v2 {
         move_encoder(-.3, 0, 25);
         getGem(1, true);
         move_encoder(.3, 0, 25);
-        resetGemArm();
+        resetGem();
         move_encoder(0, -.3, 500);
     }
 }
