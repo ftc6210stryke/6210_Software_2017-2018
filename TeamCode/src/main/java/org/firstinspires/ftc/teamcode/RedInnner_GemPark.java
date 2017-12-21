@@ -21,13 +21,13 @@ public class RedInnner_GemPark extends AutoLibrary_v2{
     public void runOpMode() throws InterruptedException {
 
         initialize();
-        extendGemArm(true);
+//        extendGemArm(true);
         sleep(500);
         getGem(10, true);
         sleep(500);
-        extendGemArm(false);
+//        extendGemArm(false);
         sleep(500);
-        gemFlick.setPosition(.85);
+//        gemFlick.setPosition(.85);
         sleep(100);
         move_encoder(0, .25, 1000);
         sleep(500);

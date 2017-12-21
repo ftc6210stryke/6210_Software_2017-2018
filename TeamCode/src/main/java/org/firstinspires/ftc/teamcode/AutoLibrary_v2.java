@@ -59,8 +59,8 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public CRServo rOutput;
     public CRServo lOutput;
 
-    public CRServo gemArm;
-    public Servo gemFlick;
+    public Servo gemServo_yaw;
+    public Servo gemServo_pitch;
 
     boolean hold;
 
@@ -76,8 +76,8 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         rOutput = hardwareMap.get(CRServo.class, "rOut");
         lOutput = hardwareMap.get(CRServo.class, "lOut");
         belt = hardwareMap.get(CRServo.class, "belt");
-        gemFlick = hardwareMap.get(Servo.class, "gF");
-        gemArm = hardwareMap.get(CRServo.class, "gExt");
+        gemServo_yaw = hardwareMap.get(Servo.class, "GsY");
+        gemServo_pitch = hardwareMap.get(Servo.class, "GsP");
 
 //        fldrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        frdrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -102,7 +102,8 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        gemFlick.setPosition(.5);
+        resetGem();
+
         hold = false;
 
         waitForStart();
@@ -626,7 +627,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     //Uses gem Flick servo and color sensor to detect the the jewel and knock off the correct one
     //returns true if successful
-    public boolean getGem(int threshold, boolean isRed) {
+/*    public boolean getGem(int threshold, boolean isRed) {
         telemetry.addLine("starting getGEM");
         telemetry.update();
         sleep(100);
@@ -650,6 +651,40 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         }
         sleep(500);
         return true;
+    }*/
+
+    //new get gem
+    public boolean getGem(int threshold, boolean isRed)
+    {
+        gemServo_yaw.setPosition(.5);
+        sleep(250);
+        gemServo_pitch.setPosition(.25);
+        sleep(250);
+        if (getBlue() > getRed() && getBlue() > threshold) {
+            telemetry.addLine("blue detected");
+            telemetry.update();
+            if (isRed) {gemServo_yaw.setPosition(0);}
+            else {gemServo_yaw.setPosition(1);}
+        }
+        else if (getRed() > getBlue() && getRed() > threshold) {
+            telemetry.addLine("red detected");
+            telemetry.update();
+            if(isRed) {gemServo_yaw.setPosition(1);}
+            else {gemServo_yaw.setPosition(0);}
+        }
+        else {
+            telemetry.addLine("color sensing failed");
+            telemetry.update();
+            sleep(250);
+            gemServo_pitch.setPosition(0);
+            sleep(250);
+            gemServo_yaw.setPosition(0);
+            sleep(250);
+            return false;
+        }
+        sleep(250);
+        resetGem();
+        return true;
     }
 
     //Above, but makes multiple attempts
@@ -662,23 +697,26 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         }
     }
 
-    //sets gem arm back to start position, .5
-    public void resetGemArm()
+    //sets gem arm back to start position
+    public void resetGem()
     {
-        gemFlick.setPosition(.5);
+        gemServo_pitch.setPosition(0);
+        sleep(250);
+        gemServo_yaw.setPosition(0);
+        sleep(250);
     }
 
-    public void extendGemArm(boolean isForward)
-    {
-        int direction = -1;
-        if (!isForward) direction = 1;
-        double timeStart = System.currentTimeMillis();
-        while (System.currentTimeMillis() - timeStart < 3400 && opModeIsActive()) //3300
-        {
-            gemArm.setPower(.7 * direction);
-        }
-        gemArm.setPower(0);
-    }
+//    public void extendGemArm(boolean isForward)
+//    {
+//        int direction = -1;
+//        if (!isForward) direction = 1;
+//        double timeStart = System.currentTimeMillis();
+//        while (System.currentTimeMillis() - timeStart < 3400 && opModeIsActive()) //3300
+//        {
+//            gemArm.setPower(.7 * direction);
+//        }
+//        gemArm.setPower(0);
+//    }
 
     public void relic() {
         //empty

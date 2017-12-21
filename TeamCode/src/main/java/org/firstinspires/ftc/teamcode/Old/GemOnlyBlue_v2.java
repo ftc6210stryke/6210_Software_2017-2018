@@ -43,7 +43,7 @@ public class GemOnlyBlue_v2 extends AutoLibrary_v2 {
             move_yaxis_basic(.35);
         }
         stop_motors();
-        gemFlick.setPosition(1 - gemFlick.getPosition());
+//        gemFlick.setPosition(1 - gemFlick.getPosition());
         sleep(100);
 }
 }
