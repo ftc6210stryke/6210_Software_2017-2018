@@ -10,14 +10,15 @@ Controls robot with methods from AutoLibrary class in the
 autonomous period of FTC's Relic Recovery competition.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Auto_ParkOnly;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.firstinspires.ftc.teamcode.AutoLibrary_v2;
 
 @Autonomous (name="AutoRedOuter_NOGEM", group="Auto")
-public class AutoRedOuter_NOGEM_v1 extends AutoLibrary_v2{
+public class AutoRedOuter_NOGEM_v1 extends AutoLibrary_v2 {
 
     private RelicRecoveryVuMark targetColumn;
 

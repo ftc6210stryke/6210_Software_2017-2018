@@ -10,15 +10,14 @@ Controls robot with methods from AutoLibrary class in the
 autonomous period of FTC's Relic Recovery competition.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Auto_GemOnly;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.firstinspires.ftc.teamcode.AutoLibrary_v2;
 
-@Autonomous (name="GemOnlyBlue_v3", group="Auto")
-public class GemOnlyBlue_v3 extends AutoLibrary_v2{
+@Autonomous (name="GemOnlyRed_v3", group="Auto")
+public class GemOnlyRed_v3 extends AutoLibrary_v2 {
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -26,11 +25,11 @@ public class GemOnlyBlue_v3 extends AutoLibrary_v2{
         initialize();
         extendGemArm(true);
         sleep(500);
-        getGem(10, false);
+        getGem(10, true);
         sleep(500);
         extendGemArm(false);
         sleep(500);
-        gemFlick.setPosition(.15);
+        gemFlick.setPosition(.85);
         sleep(100);
 }
 }
