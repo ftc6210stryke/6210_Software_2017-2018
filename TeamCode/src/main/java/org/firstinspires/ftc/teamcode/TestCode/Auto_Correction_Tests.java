@@ -46,10 +46,10 @@ public class Auto_Correction_Tests extends AutoLibrary_v2 {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        double angle = getAngle();
-
         waitForStart();
 
+        double angle = getAngle();
+        sleep(100);
         move_advanced_y(.25, angle, 2, 1, 2000);
         if (Math.abs(angle_delta(getAngle(), angle)) > 3)
         {
@@ -70,21 +70,5 @@ public class Auto_Correction_Tests extends AutoLibrary_v2 {
             telemetry.addLine("Correction Failed");
             telemetry.update();
         }
-        sleep(1000);
-        move_advanced_x(-.25, angle, 2, 1, 2000);
-        if (Math.abs(angle_delta(getAngle(), angle)) > 3)
-        {
-            telemetry.addLine("Correction Failed");
-            telemetry.update();
-        }
-        sleep(1000);
-        move_PID(.5, 0, .01, .05, .025, 2000, 2);
-        sleep(1000);
-        move_PID(-.5, 0, .01, .05, .025, 2000, 2);
-        if (Math.abs(angle_delta(getAngle(), angle)) > 3)
-        {
-            telemetry.addLine("Correction Failed");
-        }
-        sleep(1000);
     }
 }

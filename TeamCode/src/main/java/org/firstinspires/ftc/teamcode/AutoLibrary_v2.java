@@ -265,9 +265,9 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public double getRorBcorrection_1Axis(double targetAngle, double threshold, double intensity) {
         double output = 1;
         if (angle_delta(getAngle(), targetAngle) < -threshold) {
-            output = 1 - Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
             output = 1 + Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
+            output = 1 - Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
         }
         return output;
     }
@@ -275,9 +275,9 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public double getLorFcorrection_1Axis(double targetAngle, double threshold, double intensity) {
         double output = 1;
         if (angle_delta(getAngle(), targetAngle) < -threshold) {
-            output = 1 + Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
             output = 1 - Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
+            output = 1 + Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
         }
         return output;
     }
@@ -756,10 +756,6 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 //        }
 //        gemArm.setPower(0);
 //    }
-
-    public void relic() {
-        //empty
-    }
 
     //====================== SENSORS ======================
 
