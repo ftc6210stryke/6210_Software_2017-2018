@@ -10,12 +10,14 @@ Controls robot with methods from AutoLibrary class in the
 autonomous period of FTC's Relic Recovery competition.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Auto_GemPark;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
+import org.firstinspires.ftc.teamcode.AutoLibrary_v2;
+
 @Autonomous (name="RedInner_GemPark", group="Auto")
-public class RedInnner_GemPark extends AutoLibrary_v2{
+public class RedInnner_GemPark extends AutoLibrary_v2 {
 
     @Override
     public void runOpMode() throws InterruptedException {

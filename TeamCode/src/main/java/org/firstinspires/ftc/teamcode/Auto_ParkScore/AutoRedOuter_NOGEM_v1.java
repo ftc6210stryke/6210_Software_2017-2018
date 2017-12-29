@@ -10,7 +10,7 @@ Controls robot with methods from AutoLibrary class in the
 autonomous period of FTC's Relic Recovery competition.
  */
 
-package org.firstinspires.ftc.teamcode.Auto_ParkOnly;
+package org.firstinspires.ftc.teamcode.Auto_ParkScore;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
