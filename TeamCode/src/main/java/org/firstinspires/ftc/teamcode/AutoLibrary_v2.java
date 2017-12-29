@@ -210,7 +210,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     }
 
     /* Motor correction methods
-    The next four methods use the gyro to edit the power of a specific motor. This allows the robot correct it's angle.
+    The next four methods use the gyro to edit the power of a specific motor. This allows the robot to correct it's angle.
     * The method returns a coeffienct that the motor power must be multiplied by.
     * Never use power of .8 when using intensity of 1.
     * Ypower power formula is unique for each motor - that's why there is four methods
