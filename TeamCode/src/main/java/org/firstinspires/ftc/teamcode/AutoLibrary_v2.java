@@ -53,11 +53,10 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public DcMotor fldrive;
     public DcMotor frdrive;
     public DcMotor topTrack;
-    public DcMotor rIntake;
-    public DcMotor lIntake;
+    public DcMotor Intake;
+    public DcMotor Output;
     public CRServo belt;
-    public CRServo rOutput;
-    public CRServo lOutput;
+
 
     public CRServo gemServo_track;
     public Servo gemServo_flicker;
@@ -71,10 +70,8 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         brdrive = hardwareMap.get(DcMotor.class, "br");
         bldrive = hardwareMap.get(DcMotor.class, "bl");
         topTrack = hardwareMap.get(DcMotor.class, "topt");
-        rIntake = hardwareMap.get(DcMotor.class, "rIn");
-        lIntake = hardwareMap.get(DcMotor.class, "lIn");
-        rOutput = hardwareMap.get(CRServo.class, "rOut");
-        lOutput = hardwareMap.get(CRServo.class, "lOut");
+        Intake = hardwareMap.get(DcMotor.class, "In");
+        Output = hardwareMap.get(DcMotor.class, "Out");
         belt = hardwareMap.get(CRServo.class, "belt");
         gemServo_track = hardwareMap.get(CRServo.class, "GsT");
         gemServo_flicker = hardwareMap.get(Servo.class, "GsF");
@@ -568,8 +565,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     //starts intake motors. will run until stopped
     public void startIntake(double power) {
-        lIntake.setPower(-power);
-        rIntake.setPower(-power);
+        Intake.setPower(-power);
         belt.setPower(power);
     }
 
@@ -581,8 +577,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //starts output motors, will run until stopped
     public void startOutput(double power)
     {
-        lOutput.setPower(-power);
-        rOutput.setPower(power);
+        Output.setPower(-power);
         belt.setPower(power);
     }
 
