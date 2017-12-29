@@ -76,8 +76,8 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         rOutput = hardwareMap.get(CRServo.class, "rOut");
         lOutput = hardwareMap.get(CRServo.class, "lOut");
         belt = hardwareMap.get(CRServo.class, "belt");
-        gemServo_yaw = hardwareMap.get(Servo.class, "GsY");
-        gemServo_pitch = hardwareMap.get(Servo.class, "GsP");
+        gemServo_track = hardwareMap.get(CRServo.class, "GsT");
+        gemServo_flicker = hardwareMap.get(Servo.class, "GsF");
 
 //        fldrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //        frdrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -102,7 +102,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        resetGem();
+        //resetGem();
 
         hold = false;
 
