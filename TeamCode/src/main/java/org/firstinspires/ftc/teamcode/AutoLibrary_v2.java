@@ -59,8 +59,8 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public CRServo rOutput;
     public CRServo lOutput;
 
-    public Servo gemServo_yaw;
-    public Servo gemServo_pitch;
+    public CRServo gemServo_track;
+    public Servo gemServo_flicker;
 
     boolean hold;
 
@@ -697,9 +697,9 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         double startTime = System.currentTimeMillis();
         while (Math.abs(System.currentTimeMillis() - startTime) < time);
         {
-            gemServo_yaw.setPower(1 * direction);
+            gemServo_track.setPower(1 * direction);
         }
-        gemServo_yaw.setPower(0);
+        gemServo_track.setPower(0);
     }
 
     public boolean getGem(int threshold, boolean isRed)
@@ -707,14 +707,14 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         if (getBlue() > getRed() && getBlue() > threshold) {
             telemetry.addLine("blue detected");
             telemetry.update();
-            if (isRed) {gemServo_pitch.setPosition(0);}
-            else {gemServo_pitch.setPosition(1);}
+            if (isRed) {gemServo_flicker.setPosition(0);}
+            else {gemServo_flicker.setPosition(1);}
         }
         else if (getRed() > getBlue() && getRed() > threshold) {
             telemetry.addLine("red detected");
             telemetry.update();
-            if(isRed) {gemServo_yaw.setPosition(1);}
-            else {gemServo_yaw.setPosition(0);}
+            if(isRed) {gemServo_flicker.setPosition(1);}
+            else {gemServo_flicker.setPosition(0);}
         }
         else {
             telemetry.addLine("color sensing failed");
@@ -737,13 +737,13 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     }
 
     //sets gem arm back to start position
-    public void resetGem()
-    {
-        gemServo_pitch.setPosition(0);
-        sleep(250);
-        gemServo_yaw.setPosition(0);
-        sleep(250);
-    }
+//    public void resetGem()
+//    {
+//        gemServo_flicker.setPosition(0);
+//        sleep(250);
+//        gemServo_track.setPower(0);
+//        sleep(250);
+//    }
 
 //    public void extendGemArm(boolean isForward)
 //    {
