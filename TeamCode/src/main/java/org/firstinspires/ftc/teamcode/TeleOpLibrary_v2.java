@@ -30,22 +30,20 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public DcMotor fldrive;
     public DcMotor frdrive;
     public DcMotor topTrack;
-    public DcMotor rIntake;
-    public DcMotor lIntake;
+    public DcMotor Intake;
     public DcMotor RelicSlide;
+    public DcMotor Output;
     public CRServo belt;
-    public CRServo rOutput;
-    public CRServo lOutput;
+    public CRServo gemArm;
+    public Servo gemFlick;
+    public Servo RelicArm;
+    public Servo RelicClaw;
     public double ypower;
     public double xpower;
     public double rturnpower;
     public double lturnpower;
     public double toggleguard;
     public int outputLevel;
-    public CRServo gemArm;
-    public Servo gemFlick;
-    public Servo RelicArm;
-    public Servo RelicClaw;
 
     public void initialize() {
         frdrive = hardwareMap.get(DcMotor.class, "fr");
@@ -53,14 +51,12 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         brdrive = hardwareMap.get(DcMotor.class, "br");
         bldrive = hardwareMap.get(DcMotor.class, "bl");
         topTrack = hardwareMap.get(DcMotor.class, "topt");
-        rIntake = hardwareMap.get(DcMotor.class, "rIn");
-        lIntake = hardwareMap.get(DcMotor.class, "lIn");
+        Intake = hardwareMap.get(DcMotor.class, "In");
         RelicSlide = hardwareMap.get(DcMotor.class, "ReS");
         belt = hardwareMap.get(CRServo.class, "belt");
-        rOutput = hardwareMap.get(CRServo.class, "rOut");
-        lOutput = hardwareMap.get(CRServo.class, "lOut");
-        gemArm = hardwareMap.get(CRServo.class, "gExt");
-        gemFlick = hardwareMap.get(Servo.class, "gF");
+        Output = hardwareMap.get(DcMotor.class, "Out");
+        gemArm = hardwareMap.get(CRServo.class, "GsT");
+        gemFlick = hardwareMap.get(Servo.class, "GsF");
         RelicArm = hardwareMap.get(Servo.class, "ReA");
         RelicClaw = hardwareMap.get(Servo.class, "ReC");
 
@@ -132,7 +128,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         double output = 0;
         if (isY) {
             if (Math.abs(gamepad1.right_stick_y) > .1) {
-                output = Math.pow(gamepad1.right_stick_y, 2) * gamepad1.right_stick_y / Math.abs(gamepad1.right_stick_y);
+                output = -Math.pow(gamepad1.right_stick_y, 2) * gamepad1.right_stick_y / Math.abs(gamepad1.right_stick_y);
                 //if output is greater than .45, reduce to .45 to prevent going over 1
                 if (Math.abs(output) > .45) {
                     output = (output / Math.abs(output)) * .45;
@@ -141,7 +137,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
             }
         } else {
             if (Math.abs(gamepad1.right_stick_x) > .1) {
-                output = -Math.pow(gamepad1.right_stick_x, 2) * gamepad1.right_stick_x / Math.abs(gamepad1.right_stick_x);
+                output = Math.pow(gamepad1.right_stick_x, 2) * gamepad1.right_stick_x / Math.abs(gamepad1.right_stick_x);
                 //if xpower is greater than .45, reduce to .45 to prevent going over 1
                 if (Math.abs(output) > .45) {
                     output = (output / Math.abs(output)) * .45;
@@ -194,19 +190,16 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
     public void output(boolean control, boolean control_reverse) {
         if (control) {
-            lOutput.setPower(.8);
-            rOutput.setPower(-.8);
+            Output.setPower(.8);
             belt.setPower(.8);
             telemetry.addLine("intake command recieved");
             telemetry.update();
 
         } else if (control_reverse) {
-            lOutput.setPower(-.8);
-            rOutput.setPower(.8);
+            Output.setPower(-.8);
             belt.setPower(-.8);
         } else {
-            lOutput.setPower(0);
-            rOutput.setPower(0);
+            Output.setPower(0);
             belt.setPower(0);
         }
     }
@@ -214,18 +207,15 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public void intake(boolean control, boolean control_reverse) {
         if (control)
         {
-            rIntake.setPower(-.9);
-            lIntake.setPower(-.9);
+            Intake.setPower(-.9);
         }
         else if (control_reverse)
         {
-            rIntake.setPower(.9);
-            lIntake.setPower(.9);
+            Intake.setPower(.9);
         }
         else
         {
-            rIntake.setPower(0);
-            lIntake.setPower(0);
+            Intake.setPower(0);
         }
     }
 
