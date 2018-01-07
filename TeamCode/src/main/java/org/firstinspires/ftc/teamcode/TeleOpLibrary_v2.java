@@ -34,8 +34,8 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public DcMotor RelicSlide;
     public DcMotor Output;
     public CRServo belt;
-    public CRServo gemArm;
-    public Servo gemFlick;
+//    public CRServo gemArm;
+//    public Servo gemFlick;
     public Servo RelicArm;
     public Servo RelicClaw;
     public double ypower;
@@ -55,8 +55,8 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         RelicSlide = hardwareMap.get(DcMotor.class, "ReS");
         belt = hardwareMap.get(CRServo.class, "belt");
         Output = hardwareMap.get(DcMotor.class, "Out");
-        gemArm = hardwareMap.get(CRServo.class, "GsT");
-        gemFlick = hardwareMap.get(Servo.class, "GsF");
+//        gemArm = hardwareMap.get(CRServo.class, "GsT");
+//        gemFlick = hardwareMap.get(Servo.class, "GsF");
         RelicArm = hardwareMap.get(Servo.class, "ReA");
         RelicClaw = hardwareMap.get(Servo.class, "ReC");
 
@@ -94,23 +94,23 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
             double pluspower = ypower + xpower;
             //as long as subtpower is over .1 (so as not to take sqaureroot of zero) power subt motors
             if (Math.abs(subtpower) > .1) {
-                fldrive.setPower(-getMecanumPower2(subtpower, drivePowerMod));
-                brdrive.setPower(getMecanumPower2(subtpower, drivePowerMod));
+                fldrive.setPower(-getMecanumPower2(subtpower)*drivePowerMod);
+                brdrive.setPower(getMecanumPower2(subtpower)*drivePowerMod);
             }
             //otherwise, subtpower motors are turned off
             else {
-                frdrive.setPower(0);
-                bldrive.setPower(0);
+                fldrive.setPower(0);
+                brdrive.setPower(0);
             }
             //as long as pluspower is over .1 (so as not to take sqaureroot of zero) power plus motors
             if (Math.abs(pluspower) > .1) {
-                frdrive.setPower(getMecanumPower2(pluspower, drivePowerMod));
-                bldrive.setPower(-getMecanumPower2(pluspower, drivePowerMod));
+                frdrive.setPower(getMecanumPower2(pluspower)*drivePowerMod);
+                bldrive.setPower(-getMecanumPower2(pluspower)*drivePowerMod);
             }
             //otherwise, pluspower motors are turned off
             else {
-                fldrive.setPower(0);
-                brdrive.setPower(0);
+                frdrive.setPower(0);
+                bldrive.setPower(0);
             }
         }
         //if not input from triggers or stick, turn motors off
@@ -149,36 +149,36 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
     //find squareroot of xpower +- ypower while keeping sign
     //MUST FOLLOW getMecanumPower1
-    public double getMecanumPower2(double xplusy, double drivePowerMod) {
-        return Math.pow(Math.abs(xplusy), .5) * (xplusy) / Math.abs(xplusy) * drivePowerMod;
+    public double getMecanumPower2(double xplusy) {
+        return Math.pow(Math.abs(xplusy), .5) * (xplusy) / Math.abs(xplusy);
     }
 
     public void turn(boolean isRight, double drivePowerMod) {
         if (isRight) {
-            frdrive.setPower(-rturnpower * drivePowerMod);
-            fldrive.setPower(-rturnpower * drivePowerMod);
-            brdrive.setPower(-rturnpower * drivePowerMod);
-            bldrive.setPower(-rturnpower * drivePowerMod);
+            frdrive.setPower(-rturnpower * Math.abs(drivePowerMod));
+            fldrive.setPower(-rturnpower * Math.abs(drivePowerMod));
+            brdrive.setPower(-rturnpower * Math.abs(drivePowerMod));
+            bldrive.setPower(-rturnpower * Math.abs(drivePowerMod));
         } else {
-            frdrive.setPower(lturnpower * drivePowerMod);
-            fldrive.setPower(lturnpower * drivePowerMod);
-            brdrive.setPower(lturnpower * drivePowerMod);
-            bldrive.setPower(lturnpower * drivePowerMod);
+            frdrive.setPower(lturnpower * Math.abs(drivePowerMod));
+            fldrive.setPower(lturnpower * Math.abs(drivePowerMod));
+            brdrive.setPower(lturnpower * Math.abs(drivePowerMod));
+            bldrive.setPower(lturnpower * Math.abs(drivePowerMod));
         }
     }
 
     public void drive_tank(double drivePowerMod) {
         if (Math.abs(gamepad1.left_stick_y) > .1) {
-            bldrive.setPower(-gamepad1.left_stick_y);
-            fldrive.setPower(-gamepad1.left_stick_y);
+            bldrive.setPower(gamepad1.left_stick_y * drivePowerMod);
+            fldrive.setPower(gamepad1.left_stick_y * drivePowerMod);
         } else {
             bldrive.setPower(0);
             fldrive.setPower(0);
         }
 
         if (Math.abs(gamepad1.right_stick_y) > .1) {
-            brdrive.setPower(gamepad1.right_stick_y);
-            frdrive.setPower(gamepad1.right_stick_y);
+            brdrive.setPower(-gamepad1.right_stick_y * drivePowerMod);
+            frdrive.setPower(-gamepad1.right_stick_y * drivePowerMod);
         } else {
             brdrive.setPower(0);
             frdrive.setPower(0);
@@ -220,7 +220,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     }
 
 
-    public void relic(double slidePowerMod, double slide_control, boolean arm_control, boolean claw_control)
+    public void relic(double slidePowerMod, double slide_control, boolean arm_control_down, boolean arm_control_up, boolean claw_control)
     {
         if (Math.abs(slide_control) > 0)
         {
@@ -230,21 +230,21 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         {
             RelicSlide.setPower(0);
         }
-        if (arm_control)
+        if (arm_control_down)
         {
-            RelicArm.setPosition(1);
+            RelicArm.setPosition(.75);
         }
-        else
+        else if (arm_control_up)
         {
-            RelicArm.setPosition(0);
+            RelicArm.setPosition(.25);
         }
         if (claw_control)
         {
-            RelicClaw.setPosition(1);
+            RelicClaw.setPosition(.75);
         }
         else
         {
-            RelicClaw.setPosition(0);
+            RelicClaw.setPosition(.25);
         }
     }
 
@@ -325,17 +325,17 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         }
     }
 
-    void gem_Test(boolean control)
-    {
-        if (control)
-        {
-            gemFlick.setPosition(.85);
-        }
-        else
-        {
-            gemFlick.setPosition(.15);
-        }
-    }
+//    void gem_Test(boolean control)
+//    {
+//        if (control)
+//        {
+//            gemFlick.setPosition(.85);
+//        }
+//        else
+//        {
+//            gemFlick.setPosition(.15);
+//        }
+//    }
 
 // ===================================== UTILITY METHODS ==================================
 
@@ -354,9 +354,9 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public double toggleDouble(double target, boolean control, double high, double low) {
         if (control && System.currentTimeMillis() - toggleguard > 500) {
             toggleguard = System.currentTimeMillis();
-            if (target == high) {
+            if (target == Math.abs(high)) {
                 target = low;
-            } else {
+            } else if (target == Math.abs(low)){
                 target = high;
             }
         }

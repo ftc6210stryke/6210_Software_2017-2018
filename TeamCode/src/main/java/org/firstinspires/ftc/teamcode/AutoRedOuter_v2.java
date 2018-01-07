@@ -28,21 +28,21 @@ public class AutoRedOuter_v2 extends AutoLibrary_v2{
         double angle = getAngle();
 //        extendGemArm(true);
         sleep(500);
-        getGem(10, true);
+//        getGem(10, true);
         sleep(500);
 //        extendGemArm(false);
         sleep(500);
 //        gemFlick.setPosition(.15);
         sleep(500);
-        move_encoder(-.25, 0, 35);
+        move_encoder(.25, 0, 35);
         sleep(500);
-        move_encoder(0, -.25, 500);
+//        move_encoder(0, -.25, 500);
         telemetry.addLine("Move : ToSymbol : Complete");
         telemetry.update();
         sleep(1000);
         targetColumn = RelicRecoveryVuMark.UNKNOWN;
         sleep(1000);
-        move_encoder(0, -.3, 1400); //1270
+        move_encoder(0, -.3, 2400); //2200
         telemetry.addLine("Move : ToLine : Complete");
         telemetry.update();
         sleep(1000);
@@ -64,15 +64,16 @@ public class AutoRedOuter_v2 extends AutoLibrary_v2{
             telemetry.update();
         }
         sleep(1000);
-        move_encoder(.25, 0, 250);
+        move_encoder(-.25, 0, 300);
         telemetry.addLine("Move : ToGlyphBox : Complete");
         telemetry.update();
-        moveTopTrack(.6, 15);
+        startOutput(-.7);
         sleep(2000);
-        move_encoder(.2, 0, 300);
-        sleep(2000);
-        moveTopTrack(-.6, 15);
-        sleep(500);
-        move_encoder(-.25, 0, 400);
+        stopOutput();
+        sleep(100);
+        move_encoder(-.2, 0, 100);
+        sleep(100);
+        move_encoder(.25, 0, 400);
+        sleep(100);
     }
 }
