@@ -13,11 +13,12 @@ autonomous period of FTC's Relic Recovery competition.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-@Autonomous (name="AutoRedOuter_v2.9", group="Auto")
-public class AutoRedOuter_v2 extends AutoLibrary_v2{
+@Autonomous (name="AutoRedInner_v2.0", group="Auto")
+public class AutoRedInner_v2 extends AutoLibrary_v2{
 
     private RelicRecoveryVuMark targetColumn;
 
@@ -27,32 +28,26 @@ public class AutoRedOuter_v2 extends AutoLibrary_v2{
         initialize();
         double angle = getAngle();
 //        extendGemArm(true);
-        sleep(500);
-//        getGem(10, true);
-        sleep(500);
+//        sleep(500);
+//        getGem(10, false);
+//        sleep(500);
 //        extendGemArm(false);
-        sleep(500);
+//        sleep(500);
 //        gemFlick.setPosition(.15);
         sleep(500);
         move_encoder(.25, 0, 35);
         sleep(500);
-//        move_encoder(0, -.25, 500);
-        telemetry.addLine("Move : ToSymbol : Complete");
-        telemetry.update();
-        sleep(1000);
-        targetColumn = RelicRecoveryVuMark.UNKNOWN;
-        sleep(1000);
-        move_encoder(0, -.3, 2400); //2200 actually right
-        telemetry.addLine("Move : ToLine : Complete");
-        telemetry.update();
-        sleep(1000);
-        if (targetColumn == RelicRecoveryVuMark.LEFT)
+        move_encoder(0, -.25, 1000);
+        turn_gyro(.25, 90, 2);
+        angle += 90;
+        move_encoder(0, -.25, 1000);
+        if (targetColumn == RelicRecoveryVuMark.RIGHT)
         {
             move_encoder(0, -.4, 1000); //1030
-            telemetry.addLine("Move : ToLeft : Complete");
+            telemetry.addLine("Move : ToRight : Complete");
             telemetry.update();
         }
-        else if (targetColumn == RelicRecoveryVuMark.CENTER) //not actually center
+        else if (targetColumn == RelicRecoveryVuMark.CENTER)
         {
             move_encoder(0, -.25, 530); //560
             telemetry.addLine("Move : ToCenter : Complete");
@@ -60,7 +55,7 @@ public class AutoRedOuter_v2 extends AutoLibrary_v2{
         }
         else
         {
-            telemetry.addLine("Move : ToRight or Unknown : Complete");
+            telemetry.addLine("Move : ToLeft or Unknown : Complete");
             telemetry.update();
         }
         sleep(1000);

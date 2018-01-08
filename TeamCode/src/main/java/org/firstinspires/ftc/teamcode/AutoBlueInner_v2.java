@@ -18,7 +18,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-@Disabled
 @Autonomous (name="AutoBlueInner_v2.0", group="Auto")
 public class AutoBlueInner_v2 extends AutoLibrary_v2{
 
@@ -30,12 +29,14 @@ public class AutoBlueInner_v2 extends AutoLibrary_v2{
         initialize();
         double angle = getAngle();
 //        extendGemArm(true);
-        sleep(500);
-        getGem(10, false);
-        sleep(500);
+//        sleep(500);
+//        getGem(10, false);
+//        sleep(500);
 //        extendGemArm(false);
-        sleep(500);
+//        sleep(500);
 //        gemFlick.setPosition(.15);
+        sleep(500);
+        move_encoder(.25, 0, 35);
         sleep(500);
         move_encoder(0, .25, 1000);
         turn_gyro(.25, -90, 2);
@@ -58,12 +59,17 @@ public class AutoBlueInner_v2 extends AutoLibrary_v2{
             telemetry.addLine("Move : ToLeft or Unknown : Complete");
             telemetry.update();
         }
-        move_encoder(.25, 0, 300);
-        startOutput(.7);
+        sleep(1000);
+        move_encoder(-.25, 0, 300); //250
+        telemetry.addLine("Move : ToGlyphBox : Complete");
+        telemetry.update();
+        startOutput(-.7);
         sleep(2000);
         stopOutput();
         sleep(100);
-        move_encoder(-.25, 0, 400);
+        move_encoder(-.2, 0, 100);
+        sleep(100);
+        move_encoder(.25, 0, 400);
         sleep(100);
     }
 }

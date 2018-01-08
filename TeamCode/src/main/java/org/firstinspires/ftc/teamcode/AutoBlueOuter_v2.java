@@ -16,7 +16,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-@Autonomous (name="AutoBlueOuter_v2.5", group="Auto")
+@Autonomous (name="AutoBlueOuter_v2.9", group="Auto")
 public class AutoBlueOuter_v2 extends AutoLibrary_v2{
 
     private RelicRecoveryVuMark targetColumn;
@@ -27,11 +27,11 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
         initialize();
         double angle = getAngle();
 //        extendGemArm(true);
-        sleep(500);
+//        sleep(500);
 //        getGem(10, false);
-        sleep(500);
+//        sleep(500);
 //        extendGemArm(false);
-        sleep(500);
+//        sleep(500);
 //        gemFlick.setPosition(.15);
         sleep(500);
         move_encoder(.25, 0, 35);
@@ -42,7 +42,7 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
         sleep(1000);
         targetColumn = RelicRecoveryVuMark.UNKNOWN;
         sleep(1000);
-        move_encoder(0, .3, 1770); //1310
+        move_encoder(0, .3, 2000); //1770
         telemetry.addLine("Move : ToLine : Complete");
         telemetry.update();
         sleep(1000);
