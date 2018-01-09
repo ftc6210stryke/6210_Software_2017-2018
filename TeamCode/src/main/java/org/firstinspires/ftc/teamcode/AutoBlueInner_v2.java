@@ -38,10 +38,10 @@ public class AutoBlueInner_v2 extends AutoLibrary_v2{
         sleep(500);
         move_encoder(.25, 0, 35);
         sleep(500);
-        move_encoder(0, .25, 1000);
-        turn_gyro(.25, -90, 2);
-        angle -= 90;
-        move_encoder(0, .25, 1000);
+        move_encoder(0, .35, 2000);
+        turn_gyro(.35, 180, 1);
+        angle += 90;
+        move_encoder(0, .35, 750);
         if (targetColumn == RelicRecoveryVuMark.RIGHT)
         {
             move_encoder(0, .4, 1000); //1030

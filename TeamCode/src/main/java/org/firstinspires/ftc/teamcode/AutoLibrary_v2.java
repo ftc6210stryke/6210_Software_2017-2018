@@ -201,7 +201,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //Use this whenever calculating angle difference
     public double angle_delta(double currentAngle, double targetAngle) {
         double delta = targetAngle - currentAngle;
-        if (delta < -180) {
+        if (delta <= -180) {
             delta += 360;
         } else if (delta > 180) {
             delta -= 360;
@@ -682,17 +682,19 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 //        return true;
 //    }
 
+
+    //Time : 1200
     public void extendGem(int time, boolean isForward)
     {
-        int direction = 1;
+        int direction = -1;
         if(!isForward)
         {
-            direction = -1;
+            direction = 1;
         }
         double startTime = System.currentTimeMillis();
         while (Math.abs(System.currentTimeMillis() - startTime) < time);
         {
-            gemServo_track.setPower(1 * direction);
+            gemServo_track.setPower(.5 * direction);
         }
         gemServo_track.setPower(0);
     }

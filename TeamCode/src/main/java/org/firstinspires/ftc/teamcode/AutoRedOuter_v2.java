@@ -26,14 +26,14 @@ public class AutoRedOuter_v2 extends AutoLibrary_v2{
 
         initialize();
         double angle = getAngle();
-//        extendGemArm(true);
+        extendGem(1200, true);
         sleep(500);
 //        getGem(10, true);
-        sleep(500);
-//        extendGemArm(false);
+//        sleep(500);
+        extendGem(1200, false);
         sleep(500);
 //        gemFlick.setPosition(.15);
-        sleep(500);
+//        sleep(500);
         move_encoder(.25, 0, 35);
         sleep(500);
 //        move_encoder(0, -.25, 500);
