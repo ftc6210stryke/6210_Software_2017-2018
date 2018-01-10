@@ -28,11 +28,11 @@ public class AutoBlueInner_v2 extends AutoLibrary_v2{
 
         initialize();
         double angle = getAngle();
-//        extendGemArm(true);
+//        extendGem(true);
 //        sleep(500);
 //        getGem(10, false);
 //        sleep(500);
-//        extendGemArm(false);
+//        extendGem(false);
 //        sleep(500);
 //        gemFlick.setPosition(.15);
         sleep(500);

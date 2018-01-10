@@ -26,7 +26,7 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
 
         initialize();
         double angle = getAngle();
-        extendGem(1200, true);
+        extendGem(850, true);
         sleep(500);
 //        getGem(10, false);
 //        sleep(500);
