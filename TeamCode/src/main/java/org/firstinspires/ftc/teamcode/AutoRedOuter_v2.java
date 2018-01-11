@@ -25,18 +25,15 @@ public class AutoRedOuter_v2 extends AutoLibrary_v2{
     public void runOpMode() throws InterruptedException {
 
         initialize();
-        double angle = getAngle();
-        extendGem(1200, true);
+//        double angle = getAngle();
+        extendGem(950, true);
         sleep(500);
-//        getGem(10, true);
-//        sleep(500);
-        extendGem(1200, false);
+        getGem(5, true);
         sleep(500);
-//        gemFlick.setPosition(.15);
-//        sleep(500);
+        extendGem(950, false);
+        sleep(500);
         move_encoder(.25, 0, 35);
         sleep(500);
-//        move_encoder(0, -.25, 500);
         telemetry.addLine("Move : ToSymbol : Complete");
         telemetry.update();
         sleep(1000);
@@ -68,12 +65,13 @@ public class AutoRedOuter_v2 extends AutoLibrary_v2{
         telemetry.addLine("Move : ToGlyphBox : Complete");
         telemetry.update();
         startOutput(-.7);
-        sleep(2000);
-        stopOutput();
+        sleep(1500);
+        move_encoder(.25, 0, 100);
         sleep(100);
-        move_encoder(-.2, 0, 100);
+        move_encoder(-.2, 0, 150);
         sleep(100);
         move_encoder(.25, 0, 400);
+        stopOutput();
         sleep(100);
     }
 }

@@ -13,6 +13,7 @@ autonomous period of FTC's Relic Recovery competition.
 package org.firstinspires.ftc.teamcode.TestCode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -49,6 +50,5 @@ public class Auto_GemExt_Test extends AutoLibrary_v2 {
         }
         gemServo_track.setPower(0);
         while(!gamepad1.y && opModeIsActive()){}
-        runOpMode();
     }
 }

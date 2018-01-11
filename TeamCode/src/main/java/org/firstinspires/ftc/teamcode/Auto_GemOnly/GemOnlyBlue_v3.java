@@ -23,13 +23,11 @@ public class GemOnlyBlue_v3 extends AutoLibrary_v2 {
     public void runOpMode() throws InterruptedException {
 
         initialize();
-//        extendGemArm(true);
+        extendGem(950, true);
         sleep(500);
-        getGem(10, false);
+        getGem(5, false);
         sleep(500);
-//        extendGemArm(false);
+        extendGem(950, false);
         sleep(500);
-//        gemFlick.setPosition(.15);
-        sleep(100);
 }
 }

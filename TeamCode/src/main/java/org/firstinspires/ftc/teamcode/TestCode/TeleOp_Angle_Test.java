@@ -12,10 +12,12 @@ the driver controlled period of FTC's Relic Recovery competition.
 
 package org.firstinspires.ftc.teamcode.TestCode;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.TeleOpLibrary_v2;
 
+@Disabled
 @TeleOp(name="Angle Tests", group="TeleOp")
 public class TeleOp_Angle_Test extends TeleOpLibrary_Testing_DriveOnly
 {

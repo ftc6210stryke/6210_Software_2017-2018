@@ -12,6 +12,7 @@ Holds methods to be used for Autonomous programs in FTC's Relic Recovery Competi
 package org.firstinspires.ftc.teamcode.TestCode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -23,7 +24,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-
+@Disabled
 public abstract class TeleOpLibrary_Testing_DriveOnly extends OpMode {
     public DcMotor bldrive;
     public DcMotor brdrive;

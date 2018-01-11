@@ -28,18 +28,16 @@ public class AutoBlueInner_v2 extends AutoLibrary_v2{
 
         initialize();
         double angle = getAngle();
-//        extendGemArm(true);
-//        sleep(500);
-//        getGem(10, false);
-//        sleep(500);
-//        extendGemArm(false);
-//        sleep(500);
-//        gemFlick.setPosition(.15);
+        extendGem(950, true);
+        sleep(500);
+        getGem(5, false);
+        sleep(500);
+        extendGem(950, false);
         sleep(500);
         move_encoder(.25, 0, 35);
         sleep(500);
         move_encoder(0, .35, 2000);
-        turn_gyro(.35, 180, 1);
+        turn_gyro(.4, 180, 2);
         angle += 90;
         move_encoder(0, .35, 750);
         if (targetColumn == RelicRecoveryVuMark.RIGHT)
@@ -64,12 +62,13 @@ public class AutoBlueInner_v2 extends AutoLibrary_v2{
         telemetry.addLine("Move : ToGlyphBox : Complete");
         telemetry.update();
         startOutput(-.7);
-        sleep(2000);
-        stopOutput();
+        sleep(1500);
+        move_encoder(.25, 0, 100);
         sleep(100);
-        move_encoder(-.2, 0, 100);
+        move_encoder(-.2, 0, 150);
         sleep(100);
         move_encoder(.25, 0, 400);
+        stopOutput();
         sleep(100);
     }
 }

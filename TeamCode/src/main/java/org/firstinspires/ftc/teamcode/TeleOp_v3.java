@@ -30,6 +30,7 @@ public class TeleOp_v3 extends TeleOpLibrary_v2
         hold = false;
         relic_claw = false;
         initialize();
+        RelicArm.setPosition(.75);
     }
 
     /*
@@ -69,15 +70,7 @@ public class TeleOp_v3 extends TeleOpLibrary_v2
         hold = toggle(hold, gamepad2.y);
         tank = toggle(tank, gamepad1.b);
         relic_claw = toggle(relic_claw, gamepad2.a);
-        reverse = toggle(reverse, gamepad1.y);
-        if (reverse)
-        {
-            drivePowerMod = toggleDouble(drivePowerMod, gamepad1.x, .8, .3) * -1;
-        }
-        else
-        {
-            drivePowerMod = toggleDouble(drivePowerMod, gamepad1.x, .8, .3);
-        }
+        drivePowerMod = toggleDouble(drivePowerMod, gamepad1.x, .8, .3);
 
 
     }

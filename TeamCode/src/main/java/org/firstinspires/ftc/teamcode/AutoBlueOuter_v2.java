@@ -26,13 +26,11 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
 
         initialize();
         double angle = getAngle();
-        extendGem(1200, true);
+        extendGem(950, true);
         sleep(500);
-//        getGem(10, false);
-//        sleep(500);
-        extendGem(1200, false);
+        getGem(5, false);
         sleep(500);
-//        gemFlick.setPosition(.15);
+        extendGem(950, false);
         sleep(500);
         move_encoder(.25, 0, 35);
         sleep(500);
@@ -42,7 +40,7 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
         sleep(1000);
         targetColumn = RelicRecoveryVuMark.UNKNOWN;
         sleep(1000);
-        move_encoder(0, .3, 2275); //2100
+        move_encoder(0, .3, 2200); //2100
         telemetry.addLine("Move : ToLine : Complete");
         telemetry.update();
         sleep(1000);
@@ -68,12 +66,13 @@ public class AutoBlueOuter_v2 extends AutoLibrary_v2{
         telemetry.addLine("Move : ToGlyphBox : Complete");
         telemetry.update();
         startOutput(-.7);
-        sleep(2000);
-        stopOutput();
+        sleep(1500);
+        move_encoder(.25, 0, 100);
         sleep(100);
-        move_encoder(-.2, 0, 100);
+        move_encoder(-.2, 0, 150);
         sleep(100);
         move_encoder(.25, 0, 400);
+        stopOutput();
         sleep(100);
     }
 }

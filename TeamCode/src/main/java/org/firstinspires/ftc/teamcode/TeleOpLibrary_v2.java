@@ -90,8 +90,8 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         //if either joystick is over .1, engage mecanum drive
         else if (Math.abs(gamepad1.right_stick_x) > .1 || Math.abs(gamepad1.right_stick_y) > .1) {
             //subtpower && pluspower in formulas specific to controlling the wheels in mecanum drive
-            double subtpower = ypower - xpower;
-            double pluspower = ypower + xpower;
+            double subtpower = ypower + xpower;
+            double pluspower = ypower - xpower;
             //as long as subtpower is over .1 (so as not to take sqaureroot of zero) power subt motors
             if (Math.abs(subtpower) > .1) {
                 fldrive.setPower(-getMecanumPower2(subtpower)*drivePowerMod);
@@ -222,7 +222,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
     public void relic(double slidePowerMod, double slide_control, boolean arm_control_down, boolean arm_control_up, boolean claw_control)
     {
-        if (Math.abs(slide_control) > 0)
+        if (Math.abs(slide_control) > .1)
         {
             RelicSlide.setPower(slide_control * slidePowerMod);
         }
@@ -232,11 +232,11 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         }
         if (arm_control_down)
         {
-            RelicArm.setPosition(.75);
+            RelicArm.setPosition(.1);
         }
         else if (arm_control_up)
         {
-            RelicArm.setPosition(.25);
+            RelicArm.setPosition(.75);
         }
         if (claw_control)
         {

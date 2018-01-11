@@ -23,6 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.AutoLibrary_v2;
 
+@Disabled
 @Autonomous (name="Correction Test 2", group="Auto")
 public class Auto_Correction_Tests extends AutoLibrary_v2 {
 

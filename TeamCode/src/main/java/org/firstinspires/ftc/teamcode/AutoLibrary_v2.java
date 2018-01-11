@@ -99,7 +99,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        //resetGem();
+        gemServo_flicker.setPosition(0);
 
         hold = false;
 
@@ -178,7 +178,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public void move_encoder(double ypower, double xpower, double distance) {
         double start = getEncoderAvg();
         double startTime = System.currentTimeMillis();
-        while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive() && System.currentTimeMillis() - startTime < 4000 + distance*2) {
+        while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive() && System.currentTimeMillis() - startTime < 2000 + distance*2) {
             move_biaxis_basic(ypower, xpower);
         }
         stop_motors();
@@ -284,11 +284,11 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     {
         while (Math.abs(angle_delta(getAngle(), targetAngle)) > threshold && opModeIsActive())
         {
-            if (angle_delta(getAngle(), targetAngle) > 0)
+            if (angle_delta(getAngle(), targetAngle) > threshold)
             {
                 turn_basic(-power);
             }
-            else
+            else if (angle_delta(getAngle(), targetAngle) < -threshold)
             {
                 turn_basic(power);
             }
@@ -577,7 +577,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //starts output motors, will run until stopped
     public void startOutput(double power)
     {
-        Output.setPower(-power);
+        Output.setPower(power);
         belt.setPower(power);
     }
 
@@ -686,13 +686,26 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //Time : 1200
     public void extendGem(int time, boolean isForward)
     {
-        int direction = -1;
+        int direction = 1;
         if(!isForward)
         {
-            direction = 1;
+            direction = -1;
         }
         double startTime = System.currentTimeMillis();
-        while (Math.abs(System.currentTimeMillis() - startTime) < time);
+        while (Math.abs(System.currentTimeMillis() - startTime) < time/2 && opModeIsActive())
+        {
+            gemServo_track.setPower(.5 * direction);
+        }
+        if (isForward)
+        {
+            gemServo_flicker.setPosition(.35);
+        }
+        else
+        {
+            gemServo_flicker.setPosition(0);
+        }
+        startTime = System.currentTimeMillis();
+        while (Math.abs(System.currentTimeMillis() - startTime) < time/2 && opModeIsActive())
         {
             gemServo_track.setPower(.5 * direction);
         }
@@ -704,14 +717,14 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         if (getBlue() > getRed() && getBlue() > threshold) {
             telemetry.addLine("blue detected");
             telemetry.update();
-            if (isRed) {gemServo_flicker.setPosition(0);}
-            else {gemServo_flicker.setPosition(1);}
+            if (isRed) {gemServo_flicker.setPosition(.7);}
+            else {gemServo_flicker.setPosition(0);}
         }
         else if (getRed() > getBlue() && getRed() > threshold) {
             telemetry.addLine("red detected");
             telemetry.update();
-            if(isRed) {gemServo_flicker.setPosition(1);}
-            else {gemServo_flicker.setPosition(0);}
+            if(isRed) {gemServo_flicker.setPosition(0);}
+            else {gemServo_flicker.setPosition(.7);}
         }
         else {
             telemetry.addLine("color sensing failed");

@@ -15,9 +15,11 @@ package org.firstinspires.ftc.teamcode.TestCode;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.AutoLibrary_v2;
 
+@Disabled
 @Autonomous (name="Encoder Test", group="Auto")
 public class Auto_Encoder_Tests extends AutoLibrary_v2 {
 
