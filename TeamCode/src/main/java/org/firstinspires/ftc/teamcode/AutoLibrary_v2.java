@@ -683,7 +683,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 //    }
 
 
-    //Time : 1200
+
     public void extendGem(int time, boolean isForward)
     {
         int direction = -1;
