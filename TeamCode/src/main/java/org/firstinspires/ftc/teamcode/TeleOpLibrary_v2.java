@@ -44,6 +44,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public double lturnpower;
     public double toggleguard;
     public int outputLevel;
+    public double reverse;
 
     public void initialize() {
         frdrive = hardwareMap.get(DcMotor.class, "fr");
@@ -65,6 +66,10 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         lturnpower = 0;
         rturnpower = 0;
         toggleguard = 0;
+
+        RelicClaw.setPosition(.75);
+
+        reverse = 1;
 
         telemetry.addLine("Init complete");
         telemetry.update();
@@ -94,8 +99,8 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
             double pluspower = ypower - xpower;
             //as long as subtpower is over .1 (so as not to take sqaureroot of zero) power subt motors
             if (Math.abs(subtpower) > .1) {
-                fldrive.setPower(-getMecanumPower2(subtpower)*drivePowerMod);
-                brdrive.setPower(getMecanumPower2(subtpower)*drivePowerMod);
+                fldrive.setPower(-getMecanumPower2(subtpower)*drivePowerMod * reverse);
+                brdrive.setPower(getMecanumPower2(subtpower)*drivePowerMod * reverse);
             }
             //otherwise, subtpower motors are turned off
             else {
@@ -104,8 +109,8 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
             }
             //as long as pluspower is over .1 (so as not to take sqaureroot of zero) power plus motors
             if (Math.abs(pluspower) > .1) {
-                frdrive.setPower(getMecanumPower2(pluspower)*drivePowerMod);
-                bldrive.setPower(-getMecanumPower2(pluspower)*drivePowerMod);
+                frdrive.setPower(getMecanumPower2(pluspower)*drivePowerMod * reverse);
+                bldrive.setPower(-getMecanumPower2(pluspower)*drivePowerMod * reverse);
             }
             //otherwise, pluspower motors are turned off
             else {
@@ -155,30 +160,30 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
     public void turn(boolean isRight, double drivePowerMod) {
         if (isRight) {
-            frdrive.setPower(-rturnpower * Math.abs(drivePowerMod));
-            fldrive.setPower(-rturnpower * Math.abs(drivePowerMod));
-            brdrive.setPower(-rturnpower * Math.abs(drivePowerMod));
-            bldrive.setPower(-rturnpower * Math.abs(drivePowerMod));
+            frdrive.setPower(-rturnpower * Math.abs(drivePowerMod) * reverse);
+            fldrive.setPower(-rturnpower * Math.abs(drivePowerMod) * reverse);
+            brdrive.setPower(-rturnpower * Math.abs(drivePowerMod) * reverse);
+            bldrive.setPower(-rturnpower * Math.abs(drivePowerMod) * reverse);
         } else {
-            frdrive.setPower(lturnpower * Math.abs(drivePowerMod));
-            fldrive.setPower(lturnpower * Math.abs(drivePowerMod));
-            brdrive.setPower(lturnpower * Math.abs(drivePowerMod));
-            bldrive.setPower(lturnpower * Math.abs(drivePowerMod));
+            frdrive.setPower(lturnpower * Math.abs(drivePowerMod) * reverse);
+            fldrive.setPower(lturnpower * Math.abs(drivePowerMod) * reverse);
+            brdrive.setPower(lturnpower * Math.abs(drivePowerMod) * reverse);
+            bldrive.setPower(lturnpower * Math.abs(drivePowerMod) * reverse);
         }
     }
 
     public void drive_tank(double drivePowerMod) {
         if (Math.abs(gamepad1.left_stick_y) > .1) {
-            bldrive.setPower(gamepad1.left_stick_y * drivePowerMod);
-            fldrive.setPower(gamepad1.left_stick_y * drivePowerMod);
+            bldrive.setPower(gamepad1.left_stick_y * drivePowerMod * reverse);
+            fldrive.setPower(gamepad1.left_stick_y * drivePowerMod * reverse);
         } else {
             bldrive.setPower(0);
             fldrive.setPower(0);
         }
 
         if (Math.abs(gamepad1.right_stick_y) > .1) {
-            brdrive.setPower(-gamepad1.right_stick_y * drivePowerMod);
-            frdrive.setPower(-gamepad1.right_stick_y * drivePowerMod);
+            brdrive.setPower(-gamepad1.right_stick_y * drivePowerMod * reverse);
+            frdrive.setPower(-gamepad1.right_stick_y * drivePowerMod * reverse);
         } else {
             brdrive.setPower(0);
             frdrive.setPower(0);
@@ -190,14 +195,14 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
 
     public void output(boolean control, boolean control_reverse) {
         if (control) {
-            Output.setPower(.8);
-            belt.setPower(.8);
+            Output.setPower(1);
+            belt.setPower(.4);
             telemetry.addLine("intake command recieved");
             telemetry.update();
 
         } else if (control_reverse) {
-            Output.setPower(-.8);
-            belt.setPower(-.8);
+            Output.setPower(-1);
+            belt.setPower(-.4);
         } else {
             Output.setPower(0);
             belt.setPower(0);
@@ -207,11 +212,11 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public void intake(boolean control, boolean control_reverse) {
         if (control)
         {
-            Intake.setPower(-.9);
+            Intake.setPower(-1);
         }
         else if (control_reverse)
         {
-            Intake.setPower(.9);
+            Intake.setPower(1);
         }
         else
         {
@@ -354,13 +359,18 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public double toggleDouble(double target, boolean control, double high, double low) {
         if (control && System.currentTimeMillis() - toggleguard > 500) {
             toggleguard = System.currentTimeMillis();
-            if (target == Math.abs(high)) {
+            if (target == high) {
                 target = low;
-            } else if (target == Math.abs(low)){
+            } else if (target == low){
                 target = high;
             }
         }
         return target;
+    }
+
+    public void setReverse(double x)
+    {
+        reverse = x;
     }
 }
 

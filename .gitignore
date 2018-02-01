@@ -26,3 +26,6 @@ build/
 
 *ASUS_PC_01*
 
+TeamCode/src/main/java/org/firstinspires/ftc/teamcode/AutoBlueInner_v2.java
+TeamCode/src/main/java/org/firstinspires/ftc/teamcode/AutoBlueOuter_v2.java
+TeamCode/src/main/java/org/firstinspires/ftc/teamcode/AutoRedOuter_v2.java

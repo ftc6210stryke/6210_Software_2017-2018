@@ -39,14 +39,13 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public BNO055IMU gyro;
     Orientation angles;
     Acceleration gravity;
-    NormalizedColorSensor colorSensor;
     ColorSensor gemSensor;
 
-    public static final String TAG = "Vuforia VuMark Sample";
-    OpenGLMatrix lastLocation = null;
-    VuforiaLocalizer vuforia;
-    VuforiaTrackable relicTemplate;
-    VuforiaTrackables relicTrackables;
+//    public static final String TAG = "Vuforia VuMark Sample";
+//    OpenGLMatrix lastLocation = null;
+//    VuforiaLocalizer vuforia;
+//    VuforiaTrackable relicTemplate;
+//    VuforiaTrackables relicTrackables;
 
     public DcMotor bldrive;
     public DcMotor brdrive;
@@ -62,6 +61,13 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public Servo gemServo_flicker;
 
     boolean hold;
+
+    public static final String TAG = "Vuforia VuMark Sample";
+    OpenGLMatrix lastLocation = null;
+    VuforiaLocalizer vuforia;
+    VuforiaTrackable relicTemplate;
+    VuforiaTrackables relicTrackables;
+    int cameraMonitorViewId;
 
     //method initialize's the robot
     public void initialize() throws InterruptedException {
@@ -83,15 +89,13 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 //        brdrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 //        bldrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-//        vision_init();
-
         gemSensor = hardwareMap.get(ColorSensor.class, "csGem");
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
         parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
         parameters.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opmode
         parameters.loggingEnabled = true;
-        parameters.loggingTag = "GRYO";
+        parameters.loggingTag = "GYRO";
         parameters.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         gyro = hardwareMap.get(BNO055IMU.class, "gyro");
         gyro.initialize(parameters);
@@ -101,21 +105,21 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
         gemServo_flicker.setPosition(0);
 
+        cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
         hold = false;
 
-        waitForStart();
-    }
+//        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+//        VuforiaLocalizer.Parameters parameters1 = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+//        parameters1.vuforiaLicenseKey = "ARUX4tP/////AAAAGXY2Dg+/sUl6gWdYntfHvN8GT9v/tqySPvCz3Nt2dTXFWQC7TJriGnCTY/vvHRRUFiSSI11yfUxGSTkNzXbHM0zBmGf3WiW6+kZsArc76UHXbUG1fHmPyIAljbqRBiNz8Kki/PlrJCwpNwmcZKNu8wvnYzGZ5phfZHXE6yyr2HvuEyX6IEYUvrvDtMImiHWHSbjK5wbgDyMinQU/FsVmDy0S1OHL+xVDk6yhjBsPBO2bsVMTKA3GRZAo+Qxjqd9nh95+jPt1EbE11VgPHzr/Zm8bKrr+gz24uxfsTgXU3sc6YLgdcegkRd6dxM5gvsu4xisSks+gkLismFPmNASP0JpDkom80KZ9MmEcbl7GnLO+";
+//        parameters1.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
+//        this.vuforia = ClassFactory.createVuforiaLocalizer(parameters1);
+//        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+//        VuforiaTrackable relicTemplate = relicTrackables.get(0);
+//        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+//        relicTrackables.activate();
 
-    // Method condenses init of Vuforia for readability
-    public void vision_init() throws InterruptedException {
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
-        parameters.vuforiaLicenseKey = "ARUX4tP/////AAAAGXY2Dg+/sUl6gWdYntfHvN8GT9v/tqySPvCz3Nt2dTXFWQC7TJriGnCTY/vvHRRUFiSSI11yfUxGSTkNzXbHM0zBmGf3WiW6+kZsArc76UHXbUG1fHmPyIAljbqRBiNz8Kki/PlrJCwpNwmcZKNu8wvnYzGZ5phfZHXE6yyr2HvuEyX6IEYUvrvDtMImiHWHSbjK5wbgDyMinQU/FsVmDy0S1OHL+xVDk6yhjBsPBO2bsVMTKA3GRZAo+Qxjqd9nh95+jPt1EbE11VgPHzr/Zm8bKrr+gz24uxfsTgXU3sc6YLgdcegkRd6dxM5gvsu4xisSks+gkLismFPmNASP0JpDkom80KZ9MmEcbl7GnLO+";
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
-        this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
-        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
-        VuforiaTrackable relicTemplate = relicTrackables.get(0);
-        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
+        waitForStart();
     }
 
     //====================== BASIC MOVEMENT METHODS ======================
@@ -200,120 +204,95 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //Returns shortest difference between two angles (relative angle), accounting for 360 to 0 skip
     //Use this whenever calculating angle difference
     public double angle_delta(double currentAngle, double targetAngle) {
-        double delta = targetAngle - currentAngle;
-        if (delta <= -180) {
-            delta += 360;
-        } else if (delta > 180) {
-            delta -= 360;
-        }
+        double delta = currentAngle - targetAngle;
+//        if (delta <= -180) {
+//            delta += 360;
+//        } else if (delta > 180) {
+//            delta -= 360;
+//        }
         return delta;
     }
 
-    /* Motor correction methods
-    The next four methods use the gyro to edit the power of a specific motor. This allows the robot to correct it's angle.
-    * The method returns a coeffienct that the motor power must be multiplied by.
-    * Never use power of .8 when using intensity of 1.
-    * Ypower power formula is unique for each motor - that's why there is four methods
-
-    NOTE flipped y power values on all corrections since y axis was working in general formula. If doesn't work, switch between two linear corrections for auto
-    */
-    public double getfrcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity) {
-        double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < -threshold) {
-            output = 1 - (ypower - xpower) / Math.abs(ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
-            output = 1 + (ypower - xpower) / Math.abs(ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+    //threshold must be .86 or above
+    //power must not exceed .7
+    public double get_gyroCorrection_RorB (double targetAngle, double threshold, double power) //use on right motors for y axis, use on back motors for x axis
+    {
+        double tempAngle = angle_delta(getAngle(), targetAngle);
+        if (Math.abs(tempAngle) > threshold)
+        {
+            if (tempAngle / Math.abs(tempAngle) == power / Math.abs(power)) //checks if signs are equal
+            {
+                return (1/(-Math.abs(tempAngle) / Math.abs(4*Math.pow(tempAngle,2)) + 1.3));
+            }
+            else if (tempAngle / Math.abs(tempAngle) != power / Math.abs(power)) //checks if signs are not equal
+            {
+                return -Math.abs(tempAngle) / Math.abs(4*Math.pow(tempAngle,2)) + 1.3;
+            }
         }
-        return output;
+        return 1;
     }
 
-    public double getbrcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity) {
-        double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < -threshold) {
-            output = 1 - (ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
-            output = 1 + (ypower + xpower) / Math.abs(ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
+    public double get_gyroCorrection_LorF (double targetAngle, double threshold, double power) //use on left motors for y axis, use on front motors for x axis
+    {
+        double tempAngle = angle_delta(getAngle(), targetAngle);
+        if (Math.abs(tempAngle) > threshold)
+        {
+            if (tempAngle / Math.abs(tempAngle) == power / Math.abs(power)) //checks if signs are equal
+            {
+                return -Math.abs(tempAngle) / Math.abs(4*Math.pow(tempAngle,2)) + 1.3;
+            }
+            else if (tempAngle / Math.abs(tempAngle) != power / Math.abs(power)) //checks if signs are not equal
+            {
+                return 1 / (-Math.abs(tempAngle) / Math.abs(4*Math.pow(tempAngle,2)) + 1.3);
+            }
         }
-        return output;
-    }
-
-    public double getflcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity) {
-        double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < -threshold) {
-            output = 1 - (-ypower - xpower) / Math.abs(-ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
-            output = 1 + (-ypower - xpower) / Math.abs(-ypower - xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        }
-        return output;
-    }
-
-    public double getblcorrection(double ypower, double xpower, double targetAngle, double threshold, double intensity) {
-        double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < -threshold) {
-            output = 1 - (-ypower + xpower) / Math.abs(-ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
-            output = 1 + (-ypower + xpower) / Math.abs(-ypower + xpower) * Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        }
-        return output;
-    }
-
-    //Following two methods are for 1 axis correction along either the y-axis or x-axis
-
-    public double getRorBcorrection_1Axis(double targetAngle, double threshold, double intensity) {
-        double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < -threshold) {
-            output = 1 + Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
-            output = 1 - Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        }
-        return output;
-    }
-
-    public double getLorFcorrection_1Axis(double targetAngle, double threshold, double intensity) {
-        double output = 1;
-        if (angle_delta(getAngle(), targetAngle) < -threshold) {
-            output = 1 - Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        } else if (angle_delta(getAngle(), targetAngle) > threshold) {
-            output = 1 + Math.atan(Math.abs(angle_delta(getAngle(), targetAngle) - threshold)) * intensity / 6.28;
-        }
-        return output;
+        return 1;
     }
 
     //uses gyro to turn a set angle
-    public void turn_gyro(double power, double targetAngle, double threshold)
+    public void turn_gyro_fixed(double power, double targetAngle, double threshold)
     {
-        while (Math.abs(angle_delta(getAngle(), targetAngle)) > threshold && opModeIsActive())
+        while (Math.abs(targetAngle - getAngle()) > threshold && opModeIsActive())
         {
-            if (angle_delta(getAngle(), targetAngle) > threshold)
+            if (targetAngle - getAngle() > threshold)
             {
                 turn_basic(-power);
             }
-            else if (angle_delta(getAngle(), targetAngle) < -threshold)
+            else if (targetAngle - getAngle() < -threshold)
             {
                 turn_basic(power);
             }
         }
     }
 
-    public void move_with_y_corrections(double ypower, double targetAngle, double threshold, double intensity)
+    public void turn_gyro(double power, double angleChange, double threshold)
     {
-        telemetry.addData("RorB correction", getRorBcorrection_1Axis(targetAngle, 2, 1));
-        telemetry.update();
-        frdrive.setPower(ypower * getRorBcorrection_1Axis(targetAngle, threshold, intensity));
-        brdrive.setPower(ypower * getRorBcorrection_1Axis(targetAngle, threshold, intensity));
-        fldrive.setPower(-ypower * getLorFcorrection_1Axis(targetAngle, threshold, intensity));
-        bldrive.setPower(-ypower * getLorFcorrection_1Axis(targetAngle, threshold, intensity));
+        double initAngle = getAngle();
+        while (Math.abs(getAngle() - initAngle) < angleChange - threshold && opModeIsActive())
+        {
+            turn_basic(power);
+            telemetry.addData("angle", getAngle());
+            telemetry.update();
+        }
+        stop_motors();
     }
 
-    public void move_with_x_corrections(double xpower, double targetAngle, double threshold, double intensity)
+    public void move_with_y_corrections(double ypower, double targetAngle, double threshold)
+        {
+        telemetry.addData("RorB correction", get_gyroCorrection_RorB(targetAngle, 2, ypower));
+        frdrive.setPower(ypower * get_gyroCorrection_RorB(targetAngle, threshold, ypower));
+        brdrive.setPower(ypower * get_gyroCorrection_RorB(targetAngle, threshold, ypower));
+        fldrive.setPower(-ypower * get_gyroCorrection_LorF(targetAngle, threshold, ypower));
+        bldrive.setPower(-ypower * get_gyroCorrection_LorF(targetAngle, threshold, ypower));
+    }
+
+    public void move_with_x_corrections(double xpower, double targetAngle, double threshold)
     {
-        telemetry.addData("RorB correction", getRorBcorrection_1Axis(targetAngle, 2, 1));
-        telemetry.update();
-        xpower = -xpower;
-        frdrive.setPower(xpower * getLorFcorrection_1Axis(targetAngle, threshold, intensity));
-        brdrive.setPower(-xpower * getRorBcorrection_1Axis(targetAngle, threshold, intensity));
-        fldrive.setPower(xpower * getLorFcorrection_1Axis(targetAngle, threshold, intensity));
-        bldrive.setPower(-xpower * getRorBcorrection_1Axis(targetAngle, threshold, intensity));
+        telemetry.addData("RorB correction", get_gyroCorrection_RorB(targetAngle, 2, xpower));
+        frdrive.setPower(-xpower * get_gyroCorrection_LorF(targetAngle, threshold, xpower));
+        brdrive.setPower(xpower * get_gyroCorrection_RorB(targetAngle, threshold, xpower));
+        fldrive.setPower(-xpower * get_gyroCorrection_LorF(targetAngle, threshold, xpower));
+        bldrive.setPower(xpower * get_gyroCorrection_RorB(targetAngle, threshold, xpower));
     }
 
     //====================== ENCODER + GYRO MOVE ======================
@@ -331,20 +310,24 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         stop_motors();
     }*/
 
-    public void move_advanced_y(double ypower, double targetAngle, double threshold, double intensity, double distance) {
+    public void move_advanced_y(double ypower, double targetAngle, double threshold, double distance) {
         double start = getEncoderAvg();
         double startTime = System.currentTimeMillis();
         while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive() && System.currentTimeMillis() - startTime < 5000) {
-            move_with_y_corrections(ypower, targetAngle, threshold, intensity);
+            move_with_y_corrections(ypower, targetAngle, threshold);
+            telemetry.addData("angle delta", angle_delta(getAngle(), targetAngle));
+            telemetry.update();
         }
         stop_motors();
      }
 
-    public void move_advanced_x(double xpower, double targetAngle, double threshold, double intensity, double distance) {
+    public void move_advanced_x(double xpower, double targetAngle, double threshold, double distance) {
         double start = getEncoderAvg();
         double startTime = System.currentTimeMillis();
         while (Math.abs(getEncoderAvg() - start) < distance && opModeIsActive() && System.currentTimeMillis() - startTime < 5000) {
-            move_with_x_corrections(xpower, targetAngle, threshold, intensity);
+            move_with_x_corrections(xpower, targetAngle, threshold);
+            telemetry.addData("angle delta", angle_delta(getAngle(), targetAngle));
+            telemetry.update();
         }
         stop_motors();
     }
@@ -364,20 +347,20 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     }
 
     //Uses time to move a set distance with angle corrections
-    public void move_advanced_timed_y(double ypower, double targetAngle, double threshold, double intensity, double duration)
+    public void move_advanced_timed_y(double ypower, double targetAngle, double threshold, double duration)
     {
         double start = System.currentTimeMillis();
         while (Math.abs(System.currentTimeMillis() - start) < duration && opModeIsActive()) {
-            move_with_y_corrections(ypower, targetAngle, threshold, intensity);
+            move_with_y_corrections(ypower, targetAngle, threshold);
         }
         stop_motors();
     }
 
-    public void move_advanced_timed_x(double xpower, double targetAngle, double threshold, double intensity, double duration)
+    public void move_advanced_timed_x(double xpower, double targetAngle, double threshold, double duration)
     {
         double start = System.currentTimeMillis();
         while (Math.abs(System.currentTimeMillis() - start) < duration && opModeIsActive()) {
-            move_with_x_corrections(xpower, targetAngle, threshold, intensity);
+            move_with_x_corrections(xpower, targetAngle, threshold);
         }
         stop_motors();
     }
@@ -414,7 +397,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //======================= PID + GRYO =========================
 
     //move method using both PID and gyro correction for a very precise move
-    public void move_advancedplus_y(double ypower, double kporp, double kintg, double kderv, double distance, double angle, double thresholdPID, double thresholdGyro, double intensityGryo) {
+    public void move_advancedplus_y(double ypower, double kporp, double kintg, double kderv, double distance, double angle, double thresholdPID, double thresholdGyro) {
         double error = distance;
         double totalError = 0;
         double prevTime = System.currentTimeMillis();
@@ -428,10 +411,10 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
             double intg = kintg * totalError;
             double derv = kderv * (error / deltaTime);
             double PIDmod = prop + intg + derv;
-            frdrive.setPower(ypower * PIDmod * getRorBcorrection_1Axis(angle, thresholdGyro, intensityGryo));
-            brdrive.setPower(ypower * PIDmod * getRorBcorrection_1Axis(angle, thresholdGyro, intensityGryo));
-            fldrive.setPower(-ypower * PIDmod * getLorFcorrection_1Axis(angle, thresholdGyro, intensityGryo));
-            bldrive.setPower(-ypower * PIDmod * getLorFcorrection_1Axis(angle, thresholdGyro, intensityGryo));
+            frdrive.setPower(ypower * get_gyroCorrection_RorB(angle, thresholdGyro, ypower));
+            brdrive.setPower(ypower * get_gyroCorrection_RorB(angle, thresholdGyro, ypower));
+            fldrive.setPower(-ypower * get_gyroCorrection_LorF(angle, thresholdGyro, ypower));
+            bldrive.setPower(-ypower * get_gyroCorrection_LorF(angle, thresholdGyro, ypower));
         }
         stop_motors();
     }
@@ -451,10 +434,10 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
             double derv = kderv * (error / deltaTime);
             double PIDmod = prop + intg + derv;
             xpower = -xpower;
-            frdrive.setPower(xpower * PIDmod * getLorFcorrection_1Axis(angle, thresholdGyro, intensityGryo));
-            brdrive.setPower(-xpower * PIDmod * getRorBcorrection_1Axis(angle, thresholdGyro, intensityGryo));
-            fldrive.setPower(xpower * PIDmod * getLorFcorrection_1Axis(angle, thresholdGyro, intensityGryo));
-            bldrive.setPower(-xpower * PIDmod * getRorBcorrection_1Axis(angle, thresholdGyro, intensityGryo));
+            frdrive.setPower(xpower * get_gyroCorrection_LorF(angle, thresholdGyro, xpower));
+            brdrive.setPower(-xpower * get_gyroCorrection_RorB(angle, thresholdGyro, xpower));
+            fldrive.setPower(xpower * get_gyroCorrection_LorF(angle, thresholdGyro, xpower));
+            bldrive.setPower(-xpower * get_gyroCorrection_RorB(angle, thresholdGyro, xpower));
         }
         stop_motors();
     }
@@ -490,7 +473,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 
     //====================== SPECIALIZED MOVEMENT / PATH-ING ========================
 
-    //Movement method (w/ gryo correction) that moves till it finds a taped line on the floor. IsRed controls whether it detects blue or red lines
+/*    //Movement method (w/ gryo correction) that moves till it finds a taped line on the floor. IsRed controls whether it detects blue or red lines
     public void move2Line_y(double ypower, double cutoff, double targetAngle, double threshold, double intensity, double thresholdColor, boolean isRed) {
         double start = getEncoderAvg();
         if (isRed) {
@@ -510,7 +493,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         double start = getEncoderAvg();
         if (isRed) {
             while (getFloorRed() < thresholdColor && Math.abs(getEncoderAvg() - start) < cutoff && opModeIsActive()) {
-                move_with_y_corrections(ypower, targetAngle, threshold, intensity);
+                move_with_y_corrections(ypower, targetAngle, threshold);
                 sleep(100);
                 stop_motors();
                 sleep(50);
@@ -559,7 +542,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
             }
         }
         stop_motors();
-    }
+    }*/
 
     //====================== MANIPULATORS ===================================
 
@@ -683,7 +666,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
 //    }
 
 
-    //Time : 1200
+
     public void extendGem(int time, boolean isForward)
     {
         int direction = 1;
@@ -694,7 +677,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         double startTime = System.currentTimeMillis();
         while (Math.abs(System.currentTimeMillis() - startTime) < time/2 && opModeIsActive())
         {
-            gemServo_track.setPower(.5 * direction);
+            gemServo_track.setPower(-.5 * direction);
         }
         if (isForward)
         {
@@ -707,7 +690,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         startTime = System.currentTimeMillis();
         while (Math.abs(System.currentTimeMillis() - startTime) < time/2 && opModeIsActive())
         {
-            gemServo_track.setPower(.5 * direction);
+            gemServo_track.setPower(-.5 * direction);
         }
         gemServo_track.setPower(0);
     }
@@ -797,7 +780,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         return gemSensor.alpha();
     }
 
-    //gets the red value from the floor
+/*    //gets the red value from the floor
     public double getFloorRed() {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         return colors.red;
@@ -807,30 +790,75 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public double getFloorBlue() {
         NormalizedRGBA colors = colorSensor.getNormalizedColors();
         return colors.blue;
-    }
+    }*/
 
     //Uses vuforia to detect the mark
     //Note - RelicRecoveryVuMark is a Class unique to vuforia code - think of it as a data type like boolean or double
-    //can return RelicRecoveryVuMark.UNKNOWN, R-.RIGHT, R-.LEFT, or R-.CENTER
-    public RelicRecoveryVuMark getSymbol() {
+    //0 = Unknown or Failed
+    //1 = Left
+    //2 = Center
+    //3 = Right
+    public int getSymbol() {
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+        parameters.vuforiaLicenseKey = "ARUX4tP/////AAAAGXY2Dg+/sUl6gWdYntfHvN8GT9v/tqySPvCz3Nt2dTXFWQC7TJriGnCTY/vvHRRUFiSSI11yfUxGSTkNzXbHM0zBmGf3WiW6+kZsArc76UHXbUG1fHmPyIAljbqRBiNz8Kki/PlrJCwpNwmcZKNu8wvnYzGZ5phfZHXE6yyr2HvuEyX6IEYUvrvDtMImiHWHSbjK5wbgDyMinQU/FsVmDy0S1OHL+xVDk6yhjBsPBO2bsVMTKA3GRZAo+Qxjqd9nh95+jPt1EbE11VgPHzr/Zm8bKrr+gz24uxfsTgXU3sc6YLgdcegkRd6dxM5gvsu4xisSks+gkLismFPmNASP0JpDkom80KZ9MmEcbl7GnLO+";
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT;
+        this.vuforia = ClassFactory.createVuforiaLocalizer(parameters);
+        VuforiaTrackables relicTrackables = this.vuforia.loadTrackablesFromAsset("RelicVuMark");
+        VuforiaTrackable relicTemplate = relicTrackables.get(0);
+        relicTemplate.setName("relicVuMarkTemplate"); // can help in debugging; otherwise not necessary
         relicTrackables.activate();
-        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
-        relicTrackables.deactivate();
-        return vuMark;
-    }
-
-    //Above, but attempts multiple times
-    public RelicRecoveryVuMark getSymbol_multitry(int tries, double angle)
-    {
-        relicTrackables.activate();
-        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
-        for (int i = 1; i < tries; i++) {
-            if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
-                turn_gyro(.2, angle, 2);
-                vuMark = RelicRecoveryVuMark.from(relicTemplate);
-            }
-            sleep(100);
+        double timeStart = System.currentTimeMillis();
+        while(System.currentTimeMillis() - timeStart < 3000 && opModeIsActive()) {}
+        switch (RelicRecoveryVuMark.from(relicTemplate)) {
+            case LEFT:
+                telemetry.addLine("Left");
+                telemetry.update();
+                return 1;
+            case CENTER:
+                telemetry.addLine("Center");
+                telemetry.update();
+                return 2;
+            case RIGHT:
+                telemetry.addLine("Right");
+                telemetry.update();
+                return 3;
+            case UNKNOWN:
+                telemetry.addLine("Failed");
+                telemetry.update();
+                return 0;
+            default:
+                telemetry.addLine("Failed");
+                telemetry.update();
+                return 0;
         }
-        return  vuMark;
+/*        Vuforia vv = new Vuforia(cameraMonitorViewId);
+        return vv.runVuforia();*/
+//        double timeStart = System.currentTimeMillis();
+//        switch (RelicRecoveryVuMark.from(relicTemplate)) {
+//        case LEFT:
+//            telemetry.addLine("Left");
+//            telemetry.update();
+//            sleep(500);
+//            return 1;
+//        case CENTER:
+//            telemetry.addLine("Center");
+//            telemetry.update();
+//            return 2;
+//        case RIGHT:
+//            telemetry.addLine("Right");
+//            telemetry.update();
+//            sleep(500);
+//            return 3;
+//        case UNKNOWN:
+//            telemetry.addLine("Failed");
+//            telemetry.update();
+//            sleep(500);
+//            return 0;
+//        default:
+//            telemetry.addLine("Failed");
+//            telemetry.update();
+//            sleep(500);
+//            return 0;
+//    }
     }
 }

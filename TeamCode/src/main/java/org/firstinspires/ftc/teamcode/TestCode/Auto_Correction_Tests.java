@@ -23,7 +23,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.AutoLibrary_v2;
 
-@Disabled
 @Autonomous (name="Correction Test 2", group="Auto")
 public class Auto_Correction_Tests extends AutoLibrary_v2 {
 
@@ -51,21 +50,28 @@ public class Auto_Correction_Tests extends AutoLibrary_v2 {
 
         double angle = getAngle();
         sleep(100);
-        move_advanced_y(.25, angle, 2, 1, 2000);
+        move_advanced_y(.3, angle, .86, 4000);
         if (Math.abs(angle_delta(getAngle(), angle)) > 3)
         {
             telemetry.addLine("Correction Failed");
             telemetry.update();
 ;        }
         sleep(1000);
-        move_advanced_y(-.25, angle, 2, 1, 2000);
+        move_advanced_y(-.3, angle, .86, 4000);
         if (Math.abs(angle_delta(getAngle(), angle)) > 3)
         {
             telemetry.addLine("Correction Failed");
             telemetry.update();
         }
         sleep(1000);
-        move_advanced_x(.25, angle, 2, 1, 2000);
+        move_advanced_x(.3, angle, .86, 4000);
+        if (Math.abs(angle_delta(getAngle(), angle)) > 3)
+        {
+            telemetry.addLine("Correction Failed");
+            telemetry.update();
+        }
+        sleep(1000);
+        move_advanced_x(-.3, angle, .86, 4000);
         if (Math.abs(angle_delta(getAngle(), angle)) > 3)
         {
             telemetry.addLine("Correction Failed");
