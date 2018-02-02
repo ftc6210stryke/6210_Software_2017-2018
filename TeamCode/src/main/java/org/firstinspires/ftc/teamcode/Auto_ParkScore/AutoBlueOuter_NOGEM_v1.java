@@ -18,6 +18,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.teamcode.AutoLibrary_v2;
 
+@Disabled
 @Autonomous (name="AutoBlueOuter_NO_GEM", group="Auto")
 public class AutoBlueOuter_NOGEM_v1 extends AutoLibrary_v2 {
 

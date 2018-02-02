@@ -10,14 +10,17 @@ Controls robot with methods from AutoLibrary class in the
 autonomous period of FTC's Relic Recovery competition.
  */
 
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.Old;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
+import org.firstinspires.ftc.teamcode.AutoLibrary_v2;
 
-@Autonomous (name="AutoRedOuter_v2.9", group="Auto")
-public class AutoRedOuter_v2 extends AutoLibrary_v2{
+@Disabled
+@Autonomous (name="AutoRedOuter_Old", group="Auto")
+public class AutoRedOuter_v2 extends AutoLibrary_v2 {
 
     private RelicRecoveryVuMark targetColumn;
 
