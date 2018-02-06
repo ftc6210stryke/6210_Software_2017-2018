@@ -23,17 +23,17 @@ public class Auto_Single_Move_Test extends AutoLibrary_v2 {
 
     @Override
     public void runOpMode() throws InterruptedException{
-        frdrive = hardwareMap.get(DcMotor.class, "fr");
-        fldrive = hardwareMap.get(DcMotor.class, "fl");
-        brdrive = hardwareMap.get(DcMotor.class, "br");
-        bldrive = hardwareMap.get(DcMotor.class, "bl");
 
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
-        waitForStart();
-
+        initialize();
         double angle = getAngle();
         move_advanced_y(.4, angle, .86, 2000);
+        /*
+
+        - 48
+        - 50.5
+        - 50.5
+        - 51.5
+
+         */
     }
 }
