@@ -374,18 +374,24 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //kderv - Derivative - power is based on rate of change rate of change of error - predicts future path and corrects for it
     public void move_PID(double ypower, double xpower, double kporp, double kintg, double kderv, double distance, double threshold) {
         double error = distance;
-        double totalError = 0;
+        double intError = 0;
+        double preError = 0;
+        double prop = 0;
+        double intg = 0;
+        double derv = 0;
+        double PIDmod = 0;
         double prevTime = System.currentTimeMillis();
         while (Math.abs(error) > threshold && opModeIsActive()) {
             double currTime = System.currentTimeMillis();
             double deltaTime = currTime - prevTime;
             prevTime = currTime;
+            preError = error;
             error = distance - getEncoderAvg();
-            totalError = error * deltaTime;
-            double prop = kporp * error;
-            double intg = kintg * totalError;
-            double derv = kderv * (error / deltaTime);
-            double PIDmod = prop + intg + derv;
+            intError = error * deltaTime;
+            prop = kporp * error;
+            intg = kintg * intError;
+            derv = kderv * (Math.abs(preError - error) / deltaTime);
+            PIDmod = prop + intg + derv;
             frdrive.setPower((ypower + xpower) * PIDmod);
             brdrive.setPower((ypower - xpower) * PIDmod);
             fldrive.setPower(-(ypower - xpower) * PIDmod);
@@ -399,45 +405,56 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //move method using both PID and gyro correction for a very precise move
     public void move_advancedplus_y(double ypower, double kporp, double kintg, double kderv, double distance, double angle, double thresholdPID, double thresholdGyro) {
         double error = distance;
-        double totalError = 0;
+        double intError = 0;
+        double preError = 0;
+        double prop = 0;
+        double intg = 0;
+        double derv = 0;
+        double PIDmod = 0;
         double prevTime = System.currentTimeMillis();
         while (Math.abs(error) > thresholdPID && opModeIsActive()) {
             double currTime = System.currentTimeMillis();
             double deltaTime = currTime - prevTime;
             prevTime = currTime;
+            preError = error;
             error = distance - getEncoderAvg();
-            totalError = error * deltaTime;
-            double prop = kporp * error;
-            double intg = kintg * totalError;
-            double derv = kderv * (error / deltaTime);
-            double PIDmod = prop + intg + derv;
-            frdrive.setPower(ypower * get_gyroCorrection_RorB(angle, thresholdGyro, ypower));
-            brdrive.setPower(ypower * get_gyroCorrection_RorB(angle, thresholdGyro, ypower));
-            fldrive.setPower(-ypower * get_gyroCorrection_LorF(angle, thresholdGyro, ypower));
-            bldrive.setPower(-ypower * get_gyroCorrection_LorF(angle, thresholdGyro, ypower));
+            intError = error * deltaTime;
+            prop = kporp * error;
+            intg = kintg * intError;
+            derv = kderv * (Math.abs(preError - error) / deltaTime);
+            PIDmod = prop + intg + derv;
+            frdrive.setPower((ypower) * PIDmod * get_gyroCorrection_RorB(angle, thresholdGyro, ypower));
+            brdrive.setPower((ypower) * PIDmod * get_gyroCorrection_RorB(angle, thresholdGyro, ypower));
+            fldrive.setPower(-(ypower) * PIDmod * get_gyroCorrection_LorF(angle, thresholdGyro, ypower));
+            bldrive.setPower(-(ypower) * PIDmod * get_gyroCorrection_LorF(angle, thresholdGyro, ypower));
         }
         stop_motors();
     }
 
     public void move_advancedplus_x(double xpower, double kporp, double kintg, double kderv, double distance, double angle, double thresholdPID, double thresholdGyro, double intensityGryo) {
         double error = distance;
-        double totalError = 0;
+        double intError = 0;
+        double preError = 0;
+        double prop = 0;
+        double intg = 0;
+        double derv = 0;
+        double PIDmod = 0;
         double prevTime = System.currentTimeMillis();
         while (Math.abs(error) > thresholdPID && opModeIsActive()) {
             double currTime = System.currentTimeMillis();
             double deltaTime = currTime - prevTime;
             prevTime = currTime;
+            preError = error;
             error = distance - getEncoderAvg();
-            totalError = error * deltaTime;
-            double prop = kporp * error;
-            double intg = kintg * totalError;
-            double derv = kderv * (error / deltaTime);
-            double PIDmod = prop + intg + derv;
-            xpower = -xpower;
-            frdrive.setPower(xpower * get_gyroCorrection_LorF(angle, thresholdGyro, xpower));
-            brdrive.setPower(-xpower * get_gyroCorrection_RorB(angle, thresholdGyro, xpower));
-            fldrive.setPower(xpower * get_gyroCorrection_LorF(angle, thresholdGyro, xpower));
-            bldrive.setPower(-xpower * get_gyroCorrection_RorB(angle, thresholdGyro, xpower));
+            intError = error * deltaTime;
+            prop = kporp * error;
+            intg = kintg * intError;
+            derv = kderv * (Math.abs(preError - error) / deltaTime);
+            PIDmod = prop + intg + derv;
+            frdrive.setPower((xpower) * PIDmod * get_gyroCorrection_LorF(angle, thresholdGyro, xpower));
+            brdrive.setPower((xpower) * PIDmod * get_gyroCorrection_RorB(angle, thresholdGyro, xpower));
+            fldrive.setPower(-(xpower) * PIDmod * get_gyroCorrection_LorF(angle, thresholdGyro, xpower));
+            bldrive.setPower(-(xpower) * PIDmod * get_gyroCorrection_RorB(angle, thresholdGyro, xpower));
         }
         stop_motors();
     }
@@ -446,7 +463,12 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     public void turn_PID(double power, double kporp, double kintg, double kderv, double targetAngle, double threshold)
     {
         double error = Math.abs(angle_delta(getAngle(), targetAngle));
-        double totalError = 0;
+        double intError = 0;
+        double preError = 0;
+        double prop = 0;
+        double intg = 0;
+        double derv = 0;
+        double PIDmod = 0;
         double prevTime = System.currentTimeMillis();
         while (Math.abs(error) > threshold && opModeIsActive())
         {
@@ -454,11 +476,11 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
             double deltaTime = currTime - prevTime;
             prevTime = currTime;
             error = Math.abs(angle_delta(getAngle(), targetAngle));
-            totalError = error * deltaTime;
-            double prop = kporp * error;
-            double intg = kintg * totalError;
-            double derv = kderv * (error / deltaTime);
-            double PIDmod = prop + intg + derv;
+            intError = error * deltaTime;
+            prop = kporp * error;
+            intg += kintg * intError;
+            derv = kderv * ((preError - error) / deltaTime);
+            PIDmod = prop + intg + derv;
             if (angle_delta(getAngle(), targetAngle) > 0)
             {
                 turn_basic(power * PIDmod);

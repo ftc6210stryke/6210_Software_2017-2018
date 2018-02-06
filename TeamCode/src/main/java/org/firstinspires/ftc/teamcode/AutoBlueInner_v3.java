@@ -38,6 +38,7 @@ public class AutoBlueInner_v3 extends AutoLibrary_v2{
         move_advanced_x(-.35, angle, .86, 2000);
         sleep(250);
         telemetry.addLine("Starting Turn");
+        telemetry.update();
         sleep(250);
         turn_gyro(.3, 90, 15); // .4, 90, 2
         sleep(250);
