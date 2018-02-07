@@ -33,6 +33,17 @@ public class Auto_Single_Move_Test extends AutoLibrary_v2 {
         - 50.5
         - 50.5
         - 51.5
+        - 50.5
+        - 50.5
+        - 48
+        - 51.5
+        - 51.5
+        - 52
+        - 49.5
+        - 52
+
+        Average = 50.5
+        actual = 48.5
 
          */
     }

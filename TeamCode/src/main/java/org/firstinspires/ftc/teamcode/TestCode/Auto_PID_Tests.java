@@ -50,5 +50,17 @@ public class Auto_PID_Tests extends AutoLibrary_v2 {
         double angle = getAngle();
 
         move_advancedplus_y(.4, k_prop, k_int, k_derv, 2000, angle, 2, .86);
+
+        /* Tests with set 1
+         * k_prop = .009
+         * k_int = .0045
+         * k_derv = .00225
+         - 49.5
+         - 50
+         - 50.5
+         - 50.5
+         - 49.5
+         Voltage = 13.5 - 13.75
+         */
     }
 }
