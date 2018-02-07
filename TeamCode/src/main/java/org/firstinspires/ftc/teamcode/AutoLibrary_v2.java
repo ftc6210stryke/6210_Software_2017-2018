@@ -431,7 +431,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         stop_motors();
     }
 
-    public void move_advancedplus_x(double xpower, double kporp, double kintg, double kderv, double distance, double angle, double thresholdPID, double thresholdGyro, double intensityGryo) {
+    public void move_advancedplus_x(double xpower, double kporp, double kintg, double kderv, double distance, double angle, double thresholdPID, double thresholdGyro) {
         double error = distance;
         double intError = 0;
         double preError = 0;
@@ -457,6 +457,16 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
             bldrive.setPower(-(xpower) * PIDmod * get_gyroCorrection_RorB(angle, thresholdGyro, xpower));
         }
         stop_motors();
+    }
+
+    void move_y_PIDGyro_Preset(double power, double distance, double targetAngle)
+    {
+        move_advancedplus_y(power, .009, .0045, .0025, distance, targetAngle, 2, .86);
+    }
+
+    void move_x_PIDGyro_Preset(double power, double distance, double targetAngle)
+    {
+        move_advancedplus_x(power, .009, .0045, .0025, distance, targetAngle, 2, .86);
     }
 
     //turn method that uses PID logic with the gyro for a very accurate turn (ERROR = angle remaining)
