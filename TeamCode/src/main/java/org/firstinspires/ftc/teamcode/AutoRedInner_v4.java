@@ -13,7 +13,9 @@ autonomous period of FTC's Relic Recovery competition.
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+@Disabled
 @Autonomous (name="AutoRedInner_v4", group="Auto")
 public class AutoRedInner_v4 extends AutoLibrary_v2{
 
@@ -27,7 +29,7 @@ public class AutoRedInner_v4 extends AutoLibrary_v2{
         sleep(250);
         targetColumn = getSymbol();
         sleep(250);
-        extendGem(1300, true);
+        extendGem(1600, false); //1300
         sleep(250);
         getGem(5, true);
         sleep(250);

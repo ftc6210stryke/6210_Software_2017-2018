@@ -35,6 +35,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public DcMotor Output;
     public CRServo belt;
 //    public CRServo gemArm;
+
 //    public Servo gemFlick;
     public Servo RelicArm;
     public Servo RelicClaw;
@@ -196,16 +197,13 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
     public void output(boolean control, boolean control_reverse) {
         if (control) {
             Output.setPower(1);
-            belt.setPower(.8);
             telemetry.addLine("intake command recieved");
             telemetry.update();
 
         } else if (control_reverse) {
             Output.setPower(-1);
-            belt.setPower(-.8);
         } else {
             Output.setPower(0);
-            belt.setPower(0);
         }
     }
 
@@ -213,14 +211,17 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         if (control)
         {
             Intake.setPower(-1);
+            belt.setPower(.8);
         }
         else if (control_reverse)
         {
             Intake.setPower(1);
+            belt.setPower(-.8);
         }
         else
         {
             Intake.setPower(0);
+            belt.setPower(0);
         }
     }
 
@@ -243,7 +244,7 @@ public abstract class TeleOpLibrary_v2 extends OpMode {
         {
             RelicArm.setPosition(.75);
         }
-        if (claw_control)
+        if (!claw_control)
         {
             RelicClaw.setPosition(.75);
         }

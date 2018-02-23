@@ -27,11 +27,11 @@ public class AutoRedInner_v3 extends AutoLibrary_v2{
         sleep(250);
         targetColumn = getSymbol();
         sleep(250);
-        extendGem(1300, true);
+        extendGem(1900, true); //1300
         sleep(250);
         getGem(5, true);
         sleep(250);
-        extendGem(1300, false);
+        extendGem(1900, false); //1300
         sleep(250);
         move_encoder(.25, 0, 35);
         sleep(250);

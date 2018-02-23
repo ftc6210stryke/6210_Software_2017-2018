@@ -381,13 +381,19 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         double derv = 0;
         double PIDmod = 0;
         double prevTime = System.currentTimeMillis();
-        while (Math.abs(error) > threshold && opModeIsActive()) {
-            double currTime = System.currentTimeMillis();
-            double deltaTime = currTime - prevTime;
+        double startEncoder = getEncoderAvg();
+        double deltaError = 0;
+        double currTime = 0;
+        double deltaTime = 0;
+        while (error > threshold && opModeIsActive()) {
+            currTime = System.currentTimeMillis();
+            deltaTime = currTime - prevTime;
             prevTime = currTime;
             preError = error;
-            error = distance - getEncoderAvg();
-            intError = error * deltaTime;
+            deltaError = Math.abs(getEncoderAvg() - startEncoder);
+            startEncoder = getEncoderAvg();
+            error -= deltaError;
+            intError += error * deltaTime;
             prop = kporp * error;
             intg = kintg * intError;
             derv = kderv * (Math.abs(preError - error) / deltaTime);
@@ -412,13 +418,17 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         double derv = 0;
         double PIDmod = 0;
         double prevTime = System.currentTimeMillis();
-        while (Math.abs(error) > thresholdPID && opModeIsActive()) {
+        double startEncoder = getEncoderAvg();
+        double deltaError = 0;
+        while (error > thresholdPID && opModeIsActive()) {
             double currTime = System.currentTimeMillis();
             double deltaTime = currTime - prevTime;
             prevTime = currTime;
             preError = error;
-            error = distance - getEncoderAvg();
-            intError = error * deltaTime;
+            deltaError = Math.abs(getEncoderAvg() - startEncoder);
+            startEncoder = getEncoderAvg();
+            error -= deltaError;
+            intError += error * deltaTime;
             prop = kporp * error;
             intg = kintg * intError;
             derv = kderv * (Math.abs(preError - error) / deltaTime);
@@ -440,13 +450,17 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         double derv = 0;
         double PIDmod = 0;
         double prevTime = System.currentTimeMillis();
-        while (Math.abs(error) > thresholdPID && opModeIsActive()) {
+        double startEncoder = getEncoderAvg();
+        double deltaError = 0;
+        while (error > thresholdPID && opModeIsActive()) {
             double currTime = System.currentTimeMillis();
             double deltaTime = currTime - prevTime;
             prevTime = currTime;
             preError = error;
-            error = distance - getEncoderAvg();
-            intError = error * deltaTime;
+            deltaError = Math.abs(getEncoderAvg() - startEncoder);
+            startEncoder = getEncoderAvg();
+            error -= deltaError;
+            intError += error * deltaTime;
             prop = kporp * error;
             intg = kintg * intError;
             derv = kderv * (Math.abs(preError - error) / deltaTime);
@@ -715,10 +729,10 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
         {
             gemServo_flicker.setPosition(.35);
         }
-        else
-        {
-            gemServo_flicker.setPosition(0);
-        }
+//        else
+//        {
+//            gemServo_flicker.setPosition(0);
+//        }
         startTime = System.currentTimeMillis();
         while (Math.abs(System.currentTimeMillis() - startTime) < time/2 && opModeIsActive())
         {

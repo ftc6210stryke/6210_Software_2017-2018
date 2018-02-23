@@ -20,18 +20,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.AutoLibrary_v2;
 
+@Disabled
 @Autonomous (name="PID Test", group="Auto")
 public class Auto_PID_Tests extends AutoLibrary_v2 {
 
     @Override
     public void runOpMode() throws InterruptedException{
-        frdrive = hardwareMap.get(DcMotor.class, "fr");
-        fldrive = hardwareMap.get(DcMotor.class, "fl");
-        brdrive = hardwareMap.get(DcMotor.class, "br");
-        bldrive = hardwareMap.get(DcMotor.class, "bl");
 
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        initialize();
 
         waitForStart();
 
@@ -51,7 +47,7 @@ public class Auto_PID_Tests extends AutoLibrary_v2 {
 
         move_advancedplus_y(.4, k_prop, k_int, k_derv, 2000, angle, 2, .86);
 
-        /* Tests with set 1
+        /* Test A with set 1
          * k_prop = .009
          * k_int = .0045
          * k_derv = .00225
@@ -60,6 +56,13 @@ public class Auto_PID_Tests extends AutoLibrary_v2 {
          - 50.5
          - 50.5
          - 49.5
+         Voltage = 13.5 - 13.75
+
+         Test B with set 1
+                  * k_prop = .009
+         * k_int = .0045
+         * k_derv = .00225
+         -
          Voltage = 13.5 - 13.75
          */
     }

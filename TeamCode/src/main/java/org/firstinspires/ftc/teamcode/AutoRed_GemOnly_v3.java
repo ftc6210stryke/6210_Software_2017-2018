@@ -24,11 +24,11 @@ public class AutoRed_GemOnly_v3 extends AutoLibrary_v2{
 
         initialize();
         sleep(250);
-        extendGem(1300, true);
+        extendGem(1900, true); //1300
         sleep(250);
         getGem(5, true);
         sleep(250);
-        extendGem(1300, false);
+        extendGem(1900, false); //1300
         sleep(250);
     }
 }

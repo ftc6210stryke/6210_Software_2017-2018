@@ -18,6 +18,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.AutoLibrary_v2;
 
+@Disabled
 @Autonomous (name="Single Move Test", group="Auto")
 public class Auto_Single_Move_Test extends AutoLibrary_v2 {
 

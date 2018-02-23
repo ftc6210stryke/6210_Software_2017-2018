@@ -19,6 +19,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.AutoLibrary_v2;
 
+@Disabled
 @Autonomous (name="gemTest", group="TeleOp")
 public class Auto_GemExt_Test extends AutoLibrary_v2 {
 
