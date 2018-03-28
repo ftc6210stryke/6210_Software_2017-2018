@@ -19,17 +19,32 @@ public class NihalTeleOp extends OpMode {
     public DcMotor fldrive;
     public DcMotor frdrive;
 
-    public void initialize() {
-        double y = gamepad1.left_stick_y;
-        double x = gamepad1.left_stick_x;
-        brdrive.setPower(y+x);
-        fldrive.setPower(y+x);
-        bldrive.setPower(y-x);
-        frdrive.setPower(y-x);
+    public void init() {
+
     }
 
-    loop()
+    void loop() // Mecanum Drive
     {
-
+        double y = gamepad1.left_stick_y;
+            if (Math.abs(y) < .1)
+                y = 0;
+        double x = gamepad1.left_stick_x;
+            if (Math.abs(x) < .1)
+                x = 0;
+        // brdrive.setPower(y+x);
+        // fldrive.setPower(y+x);
+        // bldrive.setPower(y-x);
+        // frdrive.setPower(y-x);
+        double newY = Math.pow(y, 2) * Math.abs(y)/y;
+        double newX = Math.pow(x, 2) * Math.abs(x)/x;
+        double XYsubtraction = newY - newX;
+        double XYaddition = newY + newX;
+        double subSquareRoot = Math.pow(Math.abs(XYsubtraction), 1/2) * Math.abs(XYsubtraction)/XYsubtraction;
+        double addSquareRoot = Math.pow(Math.abs(XYaddition), 1/2) * Math.abs(XYaddition)/XYaddition;
+        brdrive.setPower(addSquareRoot);
+        fldrive.setPower(addSquareRoot);
+        bldrive.setPower(subSquareRoot);
+        frdrive.setPower(subSquareRoot);
     }
+
 }
