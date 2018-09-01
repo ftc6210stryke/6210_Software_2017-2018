@@ -168,7 +168,7 @@ public abstract class AutoLibrary_v2 extends LinearOpMode {
     //====================== ENCODER ONLY MOVEMENT METHODS ======================
     //Uses encoders to move the robot a set distance
 
-    //recieves average enccoder value between the 4 drive motors
+    //recieves average encoder value between the 4 drive motors
     public double getEncoderAvg() {
         if (Math.abs(frdrive.getPower()) > 0) return frdrive.getCurrentPosition();
         else if (Math.abs(brdrive.getPower()) > 0) return brdrive.getCurrentPosition();
